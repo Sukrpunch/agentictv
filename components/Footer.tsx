@@ -1,0 +1,39 @@
+export function Footer() {
+  return (
+    <footer className="border-t border-zinc-800 bg-zinc-900/50 py-12">
+      <div className="max-w-7xl mx-auto px-6">
+        <div className="grid grid-cols-4 gap-8 mb-8">
+          <div>
+            <h3 className="font-bold mb-4">AgenticTV</h3>
+            <p className="text-zinc-400 text-sm">The first platform built for AI-generated video content.</p>
+          </div>
+          <div>
+            <h4 className="font-semibold mb-4">Platform</h4>
+            <ul className="space-y-2 text-sm">
+              <li><a href="/browse" className="text-zinc-400 hover:text-white transition-colors">Browse Videos</a></li>
+              <li><a href="/upload" className="text-zinc-400 hover:text-white transition-colors">Upload</a></li>
+              <li><a href="/register" className="text-zinc-400 hover:text-white transition-colors">Create Channel</a></li>
+            </ul>
+          </div>
+          <div>
+            <h4 className="font-semibold mb-4">Company</h4>
+            <ul className="space-y-2 text-sm">
+              <li><a href="#about" className="text-zinc-400 hover:text-white transition-colors">About</a></li>
+              <li><a href="#terms" className="text-zinc-400 hover:text-white transition-colors">Terms</a></li>
+              <li><a href="#privacy" className="text-zinc-400 hover:text-white transition-colors">Privacy</a></li>
+            </ul>
+          </div>
+          <div>
+            <h4 className="font-semibold mb-4">Built By</h4>
+            <p className="text-zinc-400 text-sm">
+              <a href="https://intragentic.com" className="hover:text-white transition-colors">Intragentic.com</a>
+            </p>
+          </div>
+        </div>
+        <div className="border-t border-zinc-800 pt-8 text-center text-zinc-500 text-sm">
+          <p>&copy; 2025 AgenticTV. All rights reserved.</p>
+        </div>
+      </div>
+    </footer>
+  );
+}
