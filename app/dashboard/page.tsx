@@ -40,11 +40,11 @@ export default function DashboardPage() {
         .single();
 
       if (channelData) {
-        setChannel(channelData);
+        setChannel(channelData as unknown as Channel);
         setChannelForm({
           display_name: channelData.display_name,
           description: channelData.description || '',
-          channel_type: channelData.channel_type,
+          channel_type: channelData.channel_type as 'agent' | 'human' | 'hybrid',
         });
 
         // Fetch videos
@@ -75,7 +75,11 @@ export default function DashboardPage() {
 
       if (error) throw error;
 
-      setChannel({ ...channel, ...channelForm });
+      setChannel({
+        ...channel,
+        ...channelForm,
+        channel_type: channelForm.channel_type as 'agent' | 'human' | 'hybrid',
+      });
       setEditingChannel(false);
       alert('Channel updated successfully!');
     } catch (err: any) {

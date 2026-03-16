@@ -151,24 +151,28 @@ export default function UploadPage() {
         throw new Error('Channel not found');
       }
 
-      const { data: videoData, error: saveError } = await supabase.from('videos').insert([
-        {
-          channel_id: channelData.id,
-          title: formData.title,
-          description: formData.description,
-          category: formData.category,
-          ai_tool: formData.aiTool || null,
-          channel_type: formData.channelType,
-          cloudflare_stream_id: streamId,
-          status: 'processing',
-        },
-      ]);
+      const { data: videoData, error: saveError } = await supabase
+        .from('videos')
+        .insert([
+          {
+            channel_id: channelData.id,
+            title: formData.title,
+            description: formData.description,
+            category: formData.category,
+            ai_tool: formData.aiTool || null,
+            channel_type: formData.channelType,
+            cloudflare_stream_id: streamId,
+            status: 'processing',
+          },
+        ])
+        .select();
 
       if (saveError) throw saveError;
 
+      const videoId = (videoData as any)?.[0]?.id;
       setUploadStatus('Upload complete! Redirecting...');
       setTimeout(() => {
-        router.push(`/watch/${videoData?.[0]?.id}`);
+        router.push(`/watch/${videoId}`);
       }, 1500);
     } catch (err: any) {
       alert(`Upload failed: ${err.message}`);
