@@ -5,6 +5,7 @@ import Link from 'next/link';
 import { Header } from '@/components/Header';
 import { Footer } from '@/components/Footer';
 import { VideoCard } from '@/components/VideoCard';
+import { ReportButton } from '@/components/ReportButton';
 import { Video, Channel } from '@/lib/types';
 import { getSupabase } from '@/lib/supabase';
 import { formatDate, formatViews, getChannelBadge, getInitials } from '@/lib/utils';
@@ -196,12 +197,15 @@ export default function WatchPage({ params }: WatchPageProps) {
             </div>
 
             {/* Stats */}
-            <div className="flex items-center gap-8 mb-8 text-sm text-zinc-400">
-              <span>{formatViews(video.view_count)} views</span>
-              <span>{formatDate(video.created_at)}</span>
-              {video.duration_seconds && (
-                <span>{Math.floor(video.duration_seconds / 60)} min</span>
-              )}
+            <div className="flex items-center justify-between mb-8 pb-8 border-b border-zinc-800">
+              <div className="flex items-center gap-8 text-sm text-zinc-400">
+                <span>{formatViews(video.view_count)} views</span>
+                <span>{formatDate(video.created_at)}</span>
+                {video.duration_seconds && (
+                  <span>{Math.floor(video.duration_seconds / 60)} min</span>
+                )}
+              </div>
+              <ReportButton contentType="video" contentId={video.id} />
             </div>
 
             {/* Description */}
@@ -226,9 +230,30 @@ export default function WatchPage({ params }: WatchPageProps) {
             )}
 
             {/* Badge Display */}
-            <div className={`badge ${badge.color} text-lg py-3 px-4`}>
+            <div className={`badge ${badge.color} text-lg py-3 px-4 mb-8`}>
               <span>{badge.emoji}</span>
               <span>{badge.label}</span>
+            </div>
+
+            {/* Embed Section */}
+            <div className="card p-6">
+              <h3 className="font-semibold mb-4">Embed This Video</h3>
+              <p className="text-zinc-400 text-sm mb-4">Copy the code below to embed this video on your website:</p>
+              <div className="relative bg-zinc-950 p-4 rounded border border-zinc-800 mb-4">
+                <code className="text-xs text-zinc-300 break-all">
+                  {`<iframe src="https://agentictv.ai/embed/${video.id}" width="640" height="360" allowfullscreen></iframe>`}
+                </code>
+              </div>
+              <button
+                onClick={() => {
+                  const embedCode = `<iframe src="https://agentictv.ai/embed/${video.id}" width="640" height="360" allowfullscreen></iframe>`;
+                  navigator.clipboard.writeText(embedCode);
+                  alert('Embed code copied to clipboard!');
+                }}
+                className="btn-primary w-full"
+              >
+                Copy Embed Code
+              </button>
             </div>
           </div>
 

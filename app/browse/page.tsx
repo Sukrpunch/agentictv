@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import Link from 'next/link';
 import { Header } from '@/components/Header';
 import { Footer } from '@/components/Footer';
@@ -15,49 +15,93 @@ export default function BrowsePage() {
   const [videos, setVideos] = useState<(Video & { channel?: Channel })[]>([]);
   const [selectedCategory, setSelectedCategory] = useState<VideoCategory | 'all'>('all');
   const [sortBy, setSortBy] = useState<'latest' | 'views' | 'featured'>('latest');
+  const [searchQuery, setSearchQuery] = useState('');
+  const [searchResults, setSearchResults] = useState<number>(0);
   const [loading, setLoading] = useState(true);
+  const [searchLoading, setSearchLoading] = useState(false);
 
+  // Debounced search
   useEffect(() => {
-    // Fetch videos from Supabase
-    async function fetchVideos() {
-      try {
-        const supabase = getSupabase();
-        let query = supabase
-          .from('videos')
-          .select('*, channel:channels(*)')
-          .eq('status', 'ready');
-
-        if (selectedCategory !== 'all') {
-          query = query.eq('category', selectedCategory);
-        }
-
-        if (sortBy === 'latest') {
-          query = query.order('created_at', { ascending: false });
-        } else if (sortBy === 'views') {
-          query = query.order('view_count', { ascending: false });
-        } else if (sortBy === 'featured') {
-          query = query.eq('is_featured', true).order('created_at', { ascending: false });
-        }
-
-        const { data, error } = await query.limit(20);
-
-        if (error) {
-          console.error('Error fetching videos:', error);
-          // Use placeholder data
-          setVideos(placeholderVideos);
-        } else {
-          setVideos(data || placeholderVideos);
-        }
-      } catch (err) {
-        console.error('Error:', err);
-        setVideos(placeholderVideos);
-      } finally {
-        setLoading(false);
+    const timer = setTimeout(() => {
+      if (searchQuery.trim().length > 0) {
+        performSearch();
+      } else {
+        setSearchResults(0);
+        fetchDefaultVideos();
       }
-    }
+    }, 300);
 
-    fetchVideos();
+    return () => clearTimeout(timer);
+  }, [searchQuery]);
+
+  // Fetch default videos when category/sort changes
+  useEffect(() => {
+    if (searchQuery.trim().length === 0) {
+      fetchDefaultVideos();
+    }
   }, [selectedCategory, sortBy]);
+
+  async function fetchDefaultVideos() {
+    try {
+      setLoading(true);
+      const supabase = getSupabase();
+      let query = supabase
+        .from('videos')
+        .select('*, channel:channels(*)')
+        .eq('status', 'ready');
+
+      if (selectedCategory !== 'all') {
+        query = query.eq('category', selectedCategory);
+      }
+
+      if (sortBy === 'latest') {
+        query = query.order('created_at', { ascending: false });
+      } else if (sortBy === 'views') {
+        query = query.order('view_count', { ascending: false });
+      } else if (sortBy === 'featured') {
+        query = query.eq('is_featured', true).order('created_at', { ascending: false });
+      }
+
+      const { data, error } = await query.limit(20);
+
+      if (error) {
+        console.error('Error fetching videos:', error);
+        setVideos(placeholderVideos);
+      } else {
+        setVideos(data || placeholderVideos);
+      }
+    } catch (err) {
+      console.error('Error:', err);
+      setVideos(placeholderVideos);
+    } finally {
+      setLoading(false);
+    }
+  }
+
+  async function performSearch() {
+    try {
+      setSearchLoading(true);
+      const params = new URLSearchParams({
+        q: searchQuery,
+        limit: '20',
+      });
+      if (selectedCategory !== 'all') {
+        params.append('category', selectedCategory);
+      }
+
+      const response = await fetch(`/api/search?${params}`);
+      const data = await response.json();
+
+      if (data.videos) {
+        setVideos(data.videos);
+        setSearchResults(data.total);
+      }
+    } catch (err) {
+      console.error('Search error:', err);
+    } finally {
+      setSearchLoading(false);
+    }
+  }
 
   return (
     <>
@@ -69,6 +113,45 @@ export default function BrowsePage() {
           <div className="mb-8">
             <h1 className="text-4xl font-bold mb-2">Browse Videos</h1>
             <p className="text-zinc-400">Discover AI-generated content from creators worldwide</p>
+          </div>
+
+          {/* Search Bar */}
+          <div className="mb-12">
+            <div className="relative">
+              <svg
+                className="absolute left-4 top-1/2 transform -translate-y-1/2 w-5 h-5 text-zinc-500"
+                fill="none"
+                stroke="currentColor"
+                viewBox="0 0 24 24"
+              >
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  strokeWidth={2}
+                  d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"
+                />
+              </svg>
+              <input
+                type="text"
+                placeholder="Search videos, creators, AI tools..."
+                value={searchQuery}
+                onChange={(e) => setSearchQuery(e.target.value)}
+                className="w-full pl-12 pr-12 py-3 bg-zinc-900 border border-zinc-800 rounded-lg focus:outline-none focus:border-violet-600 text-white placeholder-zinc-500 transition-colors"
+              />
+              {searchQuery && (
+                <button
+                  onClick={() => setSearchQuery('')}
+                  className="absolute right-4 top-1/2 transform -translate-y-1/2 text-zinc-500 hover:text-white transition-colors"
+                >
+                  ×
+                </button>
+              )}
+            </div>
+            {searchQuery && (
+              <p className="text-sm text-zinc-400 mt-3">
+                {searchLoading ? 'Searching...' : `${searchResults} result${searchResults !== 1 ? 's' : ''} for "${searchQuery}"`}
+              </p>
+            )}
           </div>
 
           {/* Filters */}

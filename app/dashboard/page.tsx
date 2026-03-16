@@ -10,11 +10,48 @@ import { Channel, Video } from '@/lib/types';
 import { getSupabase } from '@/lib/supabase';
 import { formatDate, formatViews, getChannelBadge } from '@/lib/utils';
 
+interface Analytics {
+  total_views: number;
+  views_by_day: { date: string; views: number }[];
+  top_videos: { id: string; title: string; view_count: number; thumbnail_url: string | null }[];
+  video_count: number;
+  channel_type: string;
+}
+
+function LineChart({ data }: { data: { date: string; views: number }[] }) {
+  const max = Math.max(...data.map(d => d.views), 1);
+  const points = data
+    .map((d, i) => {
+      const x = (i / (data.length - 1)) * 100;
+      const y = 100 - (d.views / max) * 100;
+      return `${x},${y}`;
+    })
+    .join(' ');
+
+  return (
+    <svg viewBox="0 0 100 100" preserveAspectRatio="none" className="w-full h-32">
+      {/* Grid lines */}
+      <line x1="0" y1="25" x2="100" y2="25" stroke="#27272a" strokeWidth="0.5" />
+      <line x1="0" y1="50" x2="100" y2="50" stroke="#27272a" strokeWidth="0.5" />
+      <line x1="0" y1="75" x2="100" y2="75" stroke="#27272a" strokeWidth="0.5" />
+      {/* Chart line */}
+      <polyline
+        points={points}
+        fill="none"
+        stroke="#7c3aed"
+        strokeWidth="2"
+        vectorEffect="non-scaling-stroke"
+      />
+    </svg>
+  );
+}
+
 export default function DashboardPage() {
   const router = useRouter();
   const [user, setUser] = useState<any>(null);
   const [channel, setChannel] = useState<Channel | null>(null);
   const [videos, setVideos] = useState<Video[]>([]);
+  const [analytics, setAnalytics] = useState<Analytics | null>(null);
   const [loading, setLoading] = useState(true);
   const [editingChannel, setEditingChannel] = useState(false);
   const [channelForm, setChannelForm] = useState({ display_name: '', description: '', channel_type: 'human' });
@@ -56,6 +93,22 @@ export default function DashboardPage() {
           .order('created_at', { ascending: false });
 
         setVideos(videosData || []);
+
+        // Fetch analytics
+        try {
+          const analyticsResponse = await fetch('/api/analytics', {
+            headers: {
+              'x-user-email': authUser.email || '',
+              'authorization': `Bearer ${authUser.id}`,
+            } as HeadersInit,
+          });
+          if (analyticsResponse.ok) {
+            const analyticsData = await analyticsResponse.json();
+            setAnalytics(analyticsData);
+          }
+        } catch (err) {
+          console.error('Error fetching analytics:', err);
+        }
       }
 
       setLoading(false);
@@ -270,6 +323,62 @@ export default function DashboardPage() {
                     </div>
                   )}
                 </div>
+              )}
+
+              {/* Analytics */}
+              {analytics && (
+                <>
+                  {/* Stats Cards */}
+                  <div className="grid grid-cols-3 gap-4 mb-8">
+                    <div className="card p-6 text-center">
+                      <p className="text-zinc-400 text-sm mb-1">Total Views</p>
+                      <p className="text-3xl font-bold text-violet-400">{formatViews(analytics.total_views)}</p>
+                    </div>
+                    <div className="card p-6 text-center">
+                      <p className="text-zinc-400 text-sm mb-1">Total Videos</p>
+                      <p className="text-3xl font-bold text-violet-400">{analytics.video_count}</p>
+                    </div>
+                    <div className="card p-6 text-center">
+                      <p className="text-zinc-400 text-sm mb-1">Avg Views/Video</p>
+                      <p className="text-3xl font-bold text-violet-400">
+                        {analytics.video_count > 0
+                          ? formatViews(Math.floor(analytics.total_views / analytics.video_count))
+                          : '0'}
+                      </p>
+                    </div>
+                  </div>
+
+                  {/* Views Chart */}
+                  <div className="card p-6 mb-8">
+                    <h3 className="text-xl font-bold mb-6">Views Over Last 30 Days</h3>
+                    <LineChart data={analytics.views_by_day} />
+                  </div>
+
+                  {/* Top Videos */}
+                  {analytics.top_videos.length > 0 && (
+                    <div className="card p-6 mb-8">
+                      <h3 className="text-xl font-bold mb-6">Top Videos</h3>
+                      <div className="space-y-4">
+                        {analytics.top_videos.map((video, index) => (
+                          <div key={video.id} className="flex items-center gap-4 p-4 bg-zinc-900/50 rounded-lg hover:bg-zinc-900 transition-colors">
+                            <div className="text-2xl font-bold text-violet-400 w-8">#{index + 1}</div>
+                            {video.thumbnail_url && (
+                              <img
+                                src={video.thumbnail_url}
+                                alt={video.title}
+                                className="w-16 h-9 object-cover rounded"
+                              />
+                            )}
+                            <div className="flex-1 min-w-0">
+                              <p className="font-semibold truncate">{video.title}</p>
+                              <p className="text-sm text-zinc-400">{formatViews(video.view_count)} views</p>
+                            </div>
+                          </div>
+                        ))}
+                      </div>
+                    </div>
+                  )}
+                </>
               )}
 
               {/* Videos List */}
