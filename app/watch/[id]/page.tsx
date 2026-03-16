@@ -94,8 +94,15 @@ export default function WatchPage({ params }: WatchPageProps) {
     return (
       <>
         <Header />
-        <main className="min-h-screen flex items-center justify-center">
-          <p className="text-zinc-400">Loading video...</p>
+        <main className="min-h-screen px-6 py-8">
+          <div className="max-w-7xl mx-auto">
+            <div className="aspect-video bg-zinc-800 rounded-xl animate-pulse mb-8" />
+            <div className="h-8 bg-zinc-800 rounded w-1/2 mb-6 animate-pulse" />
+            <div className="card p-6 animate-pulse">
+              <div className="h-4 bg-zinc-800 rounded mb-4 w-full" />
+              <div className="h-4 bg-zinc-800 rounded w-3/4" />
+            </div>
+          </div>
         </main>
         <Footer />
       </>
@@ -106,8 +113,14 @@ export default function WatchPage({ params }: WatchPageProps) {
     return (
       <>
         <Header />
-        <main className="min-h-screen flex items-center justify-center">
-          <p className="text-zinc-400">Video not found</p>
+        <main className="min-h-screen flex items-center justify-center px-6">
+          <div className="text-center">
+            <h1 className="text-4xl font-bold mb-4">404</h1>
+            <p className="text-zinc-400 mb-6">This video doesn't exist in our AI universe.</p>
+            <Link href="/browse" className="btn-primary inline-block">
+              Browse Videos
+            </Link>
+          </div>
         </main>
         <Footer />
       </>
@@ -125,8 +138,18 @@ export default function WatchPage({ params }: WatchPageProps) {
           {/* Main Content */}
           <div className="lg:col-span-2">
             {/* Video Player */}
-            <div className="aspect-video bg-zinc-900 rounded-lg overflow-hidden mb-8">
-              {video.cloudflare_stream_id ? (
+            <div className="aspect-video bg-zinc-900 rounded-xl overflow-hidden mb-8 flex items-center justify-center">
+              {video.status === 'processing' ? (
+                <div className="text-center">
+                  <div className="animate-spin mb-4">
+                    <svg className="w-12 h-12 text-violet-600 mx-auto" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
+                    </svg>
+                  </div>
+                  <p className="text-zinc-400">Video is processing</p>
+                  <p className="text-xs text-zinc-500 mt-2">Check back soon</p>
+                </div>
+              ) : video.cloudflare_stream_id ? (
                 <iframe
                   src={`https://customer-${video.cloudflare_stream_id}.cloudflarestream.com/embed/sdk.latest.js`}
                   loading="lazy"
@@ -189,13 +212,16 @@ export default function WatchPage({ params }: WatchPageProps) {
 
             {/* AI Credits */}
             {video.ai_tool && (
-              <div className="card p-6 mb-8 bg-violet-600/10 border-violet-600/30">
-                <h3 className="font-semibold mb-4 flex items-center gap-2">
-                  <span className="text-violet-400">🤖</span> AI Credits
-                </h3>
-                <p className="text-zinc-300">
-                  Made with <span className="font-semibold text-violet-400">{video.ai_tool}</span>
-                </p>
+              <div className="card p-6 mb-8 bg-gradient-to-r from-violet-600/20 to-violet-600/5 border border-violet-600/30">
+                <div className="flex items-center gap-3">
+                  <div className="w-10 h-10 rounded-lg bg-violet-600/30 flex items-center justify-center">
+                    <span className="text-lg">🤖</span>
+                  </div>
+                  <div>
+                    <p className="text-xs font-semibold text-violet-400 uppercase tracking-wider">Made with</p>
+                    <p className="text-lg font-bold text-white">{video.ai_tool}</p>
+                  </div>
+                </div>
               </div>
             )}
 

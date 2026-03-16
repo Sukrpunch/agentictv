@@ -107,13 +107,13 @@ export default function Home() {
 
       {/* Hero Section */}
       <section className="min-h-screen flex flex-col items-center justify-center relative overflow-hidden px-6 py-20">
-        {/* Gradient background */}
+        {/* Animated Gradient Blob */}
         <div className="absolute inset-0 -z-10">
-          <div className="absolute top-0 left-1/2 -translate-x-1/2 w-96 h-96 bg-violet-600/20 rounded-full blur-3xl" />
-          <div className="absolute bottom-0 right-0 w-96 h-96 bg-violet-600/10 rounded-full blur-3xl" />
+          <div className="absolute top-20 left-1/2 -translate-x-1/2 w-96 h-96 bg-violet-600/20 rounded-full blur-3xl animate-gradient-blob" />
+          <div className="absolute -bottom-32 right-0 w-96 h-96 bg-violet-600/10 rounded-full blur-3xl" />
         </div>
 
-        <div className="max-w-4xl text-center">
+        <div className="max-w-4xl text-center z-10">
           <h1 className="text-6xl font-bold mb-6 leading-tight">
             The First Platform Built for <span className="text-violet-400">AI-Generated Video</span>
           </h1>
@@ -122,13 +122,43 @@ export default function Home() {
           </p>
 
           {/* CTA Buttons */}
-          <div className="flex items-center justify-center gap-4 mb-12">
+          <div className="flex flex-col sm:flex-row items-center justify-center gap-4 mb-16">
             <Link href="/register" className="btn-primary">
               Start Your Channel
             </Link>
             <Link href="/browse" className="btn-secondary">
               Browse Videos
             </Link>
+          </div>
+
+          {/* Featured Videos Grid Preview */}
+          <div className="max-w-2xl mx-auto">
+            <p className="text-sm text-zinc-500 mb-6">Featured content from our creators</p>
+            <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
+              {placeholderVideos.slice(0, 3).map((video) => (
+                <Link key={video.id} href={`/watch/${video.id}`}>
+                  <div className="group relative aspect-video rounded-xl overflow-hidden bg-zinc-800 hover:scale-105 transition-transform duration-300">
+                    {video.thumbnail_url && (
+                      <img
+                        src={video.thumbnail_url}
+                        alt={video.title}
+                        className="w-full h-full object-cover"
+                      />
+                    )}
+                    <div className="absolute inset-0 bg-black/40 group-hover:bg-black/20 transition-colors flex items-center justify-center">
+                      <div className="w-10 h-10 rounded-full bg-violet-600/90 flex items-center justify-center">
+                        <svg className="w-5 h-5 text-white ml-0.5" fill="currentColor" viewBox="0 0 20 20">
+                          <path d="M6.3 2.841A1.5 1.5 0 004 4.11V15.89a1.5 1.5 0 002.3 1.269l9.344-5.89a1.5 1.5 0 000-2.538L6.3 2.84z" />
+                        </svg>
+                      </div>
+                    </div>
+                    <div className="absolute top-2 right-2 bg-violet-600/90 px-2 py-1 rounded text-xs font-semibold text-white">
+                      AI Generated
+                    </div>
+                  </div>
+                </Link>
+              ))}
+            </div>
           </div>
         </div>
       </section>

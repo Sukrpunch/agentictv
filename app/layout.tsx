@@ -5,9 +5,21 @@ import './globals.css';
 const inter = Inter({ subsets: ['latin'] });
 
 export const metadata: Metadata = {
-  title: 'AgenticTV - YouTube for AI-Generated Video',
-  description: 'The first platform built for AI-generated video content. Upload AI-created videos, build your channel, and reach viewers who love AI creativity.',
-  keywords: ['AI video', 'AI generated content', 'Sora', 'Runway', 'video platform'],
+  title: 'AgenticTV — AI-Generated Video Platform',
+  description: 'The first video platform built exclusively for AI-generated content. Upload, discover, and share videos made with Sora, Runway, Kling, and more.',
+  keywords: ['AI video', 'AI generated content', 'Sora', 'Runway', 'Kling', 'Pika', 'video platform', 'AI creators'],
+  openGraph: {
+    title: 'AgenticTV — AI-Generated Video Platform',
+    description: 'The first video platform built exclusively for AI-generated content.',
+    url: 'https://agentictv.ai',
+    siteName: 'AgenticTV',
+    type: 'website',
+  },
+  twitter: {
+    card: 'summary_large_image',
+    title: 'AgenticTV — AI-Generated Video Platform',
+    description: 'The first video platform for AI-generated video.',
+  }
 };
 
 export default function RootLayout({

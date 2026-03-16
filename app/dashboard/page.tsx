@@ -5,6 +5,7 @@ import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { Header } from '@/components/Header';
 import { Footer } from '@/components/Footer';
+import { VideoSkeleton } from '@/components/VideoSkeleton';
 import { Channel, Video } from '@/lib/types';
 import { getSupabase } from '@/lib/supabase';
 import { formatDate, formatViews, getChannelBadge } from '@/lib/utils';
@@ -97,8 +98,38 @@ export default function DashboardPage() {
     return (
       <>
         <Header />
-        <main className="min-h-screen flex items-center justify-center">
-          <p className="text-zinc-400">Loading...</p>
+        <main className="min-h-screen px-6 py-12">
+          <div className="max-w-6xl mx-auto">
+            <div className="flex items-center justify-between mb-8">
+              <h1 className="text-4xl font-bold">Dashboard</h1>
+              <div className="h-10 w-24 bg-zinc-800 rounded-xl animate-pulse" />
+            </div>
+            <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
+              <div className="lg:col-span-1">
+                <div className="card p-6 space-y-4 animate-pulse">
+                  <div className="h-8 bg-zinc-800 rounded w-2/3" />
+                  <div className="h-16 w-16 rounded-full bg-zinc-800 mx-auto" />
+                  <div className="h-4 bg-zinc-800 rounded w-1/2 mx-auto" />
+                </div>
+              </div>
+              <div className="lg:col-span-2 space-y-6">
+                <div className="card p-6 animate-pulse">
+                  <div className="h-8 bg-zinc-800 rounded w-1/3 mb-6" />
+                  <div className="space-y-4">
+                    <div className="h-4 bg-zinc-800 rounded w-full" />
+                    <div className="h-4 bg-zinc-800 rounded w-5/6" />
+                  </div>
+                </div>
+                <div className="card p-6 animate-pulse">
+                  <div className="h-8 bg-zinc-800 rounded w-1/4 mb-6" />
+                  <div className="space-y-4">
+                    <div className="h-12 bg-zinc-800 rounded w-full" />
+                    <div className="h-12 bg-zinc-800 rounded w-full" />
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
         </main>
         <Footer />
       </>
@@ -245,12 +276,15 @@ export default function DashboardPage() {
               <div className="card p-6">
                 <h2 className="text-xl font-bold mb-6">My Videos</h2>
                 {videos.length === 0 ? (
-                  <p className="text-zinc-400 text-center py-8">
-                    No videos yet.{' '}
-                    <Link href="/upload" className="text-violet-400 hover:text-violet-300">
-                      Upload your first video
+                  <div className="text-center py-12">
+                    <svg className="w-12 h-12 mx-auto text-zinc-700 mb-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M12 4v16m8-8H4" />
+                    </svg>
+                    <p className="text-zinc-400 mb-4">You haven't uploaded anything yet.</p>
+                    <Link href="/upload" className="btn-primary inline-block">
+                      Upload Your First Video
                     </Link>
-                  </p>
+                  </div>
                 ) : (
                   <div className="overflow-x-auto">
                     <table className="w-full text-sm">
@@ -271,7 +305,7 @@ export default function DashboardPage() {
                             </td>
                             <td className="py-3 px-4">
                               <span
-                                className={`inline-block px-2 py-1 rounded text-xs font-medium ${
+                                className={`inline-block px-2 py-1 rounded-lg text-xs font-medium ${
                                   video.status === 'ready'
                                     ? 'bg-green-500/20 text-green-400'
                                     : video.status === 'processing'

@@ -20,23 +20,60 @@
   }
 
   .btn-primary {
-    @apply px-6 py-3 rounded-lg font-semibold bg-violet-600 text-white hover:bg-violet-700 transition-colors disabled:opacity-50 disabled:cursor-not-allowed;
+    @apply px-6 py-3 rounded-xl font-semibold bg-violet-600 text-white hover:bg-violet-500 transition-all duration-200 active:scale-95 disabled:opacity-50 disabled:cursor-not-allowed;
   }
 
   .btn-secondary {
-    @apply px-6 py-3 rounded-lg font-semibold border border-zinc-700 text-white hover:bg-zinc-900 transition-colors disabled:opacity-50 disabled:cursor-not-allowed;
+    @apply px-6 py-3 rounded-xl font-semibold border border-zinc-700 text-white hover:bg-zinc-700 transition-all duration-200 active:scale-95 disabled:opacity-50 disabled:cursor-not-allowed;
   }
 
   .card {
-    @apply bg-zinc-900 border border-zinc-800 rounded-lg;
+    @apply bg-zinc-900 border border-zinc-800 rounded-xl;
+  }
+
+  .input {
+    @apply w-full px-4 py-3 bg-zinc-800 border border-zinc-700 rounded-xl text-white placeholder-zinc-500 focus:outline-none focus:border-violet-500 transition-colors;
   }
 
   .input-field {
-    @apply w-full px-4 py-2 rounded-lg bg-zinc-900 border border-zinc-800 text-white placeholder-zinc-500 focus:outline-none focus:border-violet-600 focus:ring-1 focus:ring-violet-600;
+    @apply w-full px-4 py-3 bg-zinc-800 border border-zinc-700 rounded-xl text-white placeholder-zinc-500 focus:outline-none focus:border-violet-500 transition-colors;
   }
 
   .badge {
     @apply inline-flex items-center gap-1 px-3 py-1 rounded-full text-sm font-medium;
+  }
+
+  /* Animations */
+  @keyframes gradient-blob {
+    0%, 100% {
+      transform: translate(0, 0) scale(1);
+    }
+    25% {
+      transform: translate(20px, -50px) scale(1.1);
+    }
+    50% {
+      transform: translate(-20px, 20px) scale(0.9);
+    }
+    75% {
+      transform: translate(50px, 50px) scale(1.05);
+    }
+  }
+
+  .animate-gradient-blob {
+    animation: gradient-blob 7s infinite;
+  }
+
+  @keyframes pulse-subtle {
+    0%, 100% {
+      opacity: 1;
+    }
+    50% {
+      opacity: 0.8;
+    }
+  }
+
+  .animate-pulse-subtle {
+    animation: pulse-subtle 2s cubic-bezier(0.4, 0, 0.6, 1) infinite;
   }
 }
 

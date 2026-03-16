@@ -62,8 +62,26 @@ export default function ChannelPage({ params }: ChannelPageProps) {
     return (
       <>
         <Header />
-        <main className="min-h-screen flex items-center justify-center">
-          <p className="text-zinc-400">Loading channel...</p>
+        <main className="min-h-screen px-6 py-12">
+          <div className="max-w-7xl mx-auto">
+            <div className="card p-8 animate-pulse mb-8">
+              <div className="flex items-start gap-6 mb-6">
+                <div className="w-24 h-24 rounded-full bg-zinc-800 flex-shrink-0" />
+                <div className="flex-1">
+                  <div className="h-8 bg-zinc-800 rounded w-1/3 mb-4" />
+                  <div className="h-4 bg-zinc-800 rounded w-2/3 mb-6" />
+                  <div className="flex gap-8">
+                    {[1, 2, 3].map((i) => (
+                      <div key={i}>
+                        <div className="h-4 bg-zinc-800 rounded w-20 mb-2" />
+                        <div className="h-6 bg-zinc-800 rounded w-16" />
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
         </main>
         <Footer />
       </>
@@ -74,8 +92,19 @@ export default function ChannelPage({ params }: ChannelPageProps) {
     return (
       <>
         <Header />
-        <main className="min-h-screen flex items-center justify-center">
-          <p className="text-zinc-400">Channel not found</p>
+        <main className="min-h-screen flex items-center justify-center px-6">
+          <div className="text-center">
+            <h1 className="text-4xl font-bold mb-4">Channel Not Found</h1>
+            <p className="text-zinc-400 mb-6">This channel doesn't exist in our AI universe.</p>
+            <div className="flex gap-4 justify-center">
+              <Link href="/browse" className="btn-primary">
+                Browse Channels
+              </Link>
+              <Link href="/register" className="btn-secondary">
+                Create Channel
+              </Link>
+            </div>
+          </div>
         </main>
         <Footer />
       </>
@@ -91,39 +120,47 @@ export default function ChannelPage({ params }: ChannelPageProps) {
       <main className="min-h-screen px-6 py-12">
         {/* Channel Header */}
         <div className="max-w-7xl mx-auto mb-12">
-          <div className="card p-8 mb-8">
-            <div className="flex items-start gap-6 mb-6">
+          {/* Banner */}
+          <div
+            className="h-32 rounded-xl mb-8 relative overflow-hidden"
+            style={{
+              background: `linear-gradient(135deg, ${channel.avatar_color}40 0%, ${channel.avatar_color}10 100%)`,
+              borderWidth: '1px',
+              borderColor: `${channel.avatar_color}40`,
+            }}
+          />
+
+          {/* Header Info */}
+          <div className="card p-8 mb-8 -mt-16 relative z-10 ml-8">
+            <div className="flex flex-col sm:flex-row items-start sm:items-end gap-6 mb-8">
               <div
-                className="w-24 h-24 rounded-full flex items-center justify-center text-4xl font-bold flex-shrink-0"
+                className="w-32 h-32 rounded-full flex items-center justify-center text-5xl font-bold flex-shrink-0 border-4 border-zinc-950"
                 style={{ backgroundColor: channel.avatar_color }}
               >
                 {getInitials(channel.display_name)}
               </div>
 
-              <div className="flex-1">
-                <div className="flex items-center gap-4 mb-2">
-                  <h1 className="text-3xl font-bold">{channel.display_name}</h1>
+              <div className="flex-1 min-w-0">
+                <div className="flex flex-wrap items-center gap-4 mb-2">
+                  <h1 className="text-4xl font-bold">{channel.display_name}</h1>
                   <div className={`badge ${badge.color}`}>
                     <span>{badge.emoji}</span>
                     <span>{badge.label}</span>
                   </div>
                 </div>
-                <p className="text-zinc-400 mb-4">{channel.description}</p>
+                <p className="text-zinc-400 mb-6 line-clamp-2">{channel.description}</p>
 
                 {/* Stats */}
-                <div className="flex gap-8 text-sm">
+                <div className="flex flex-wrap gap-6 text-sm">
                   <div>
-                    <p className="text-zinc-400">Videos</p>
-                    <p className="font-bold">{channel.video_count}</p>
+                    <p className="text-zinc-400">{channel.video_count} videos</p>
                   </div>
                   <div>
-                    <p className="text-zinc-400">Total Views</p>
-                    <p className="font-bold">{formatViews(channel.total_views)}</p>
+                    <p className="text-zinc-400">{formatViews(channel.total_views)} total views</p>
                   </div>
                   <div>
-                    <p className="text-zinc-400">Joined</p>
-                    <p className="font-bold">
-                      {new Date(channel.created_at).toLocaleDateString('en-US', {
+                    <p className="text-zinc-400">
+                      Joined {new Date(channel.created_at).toLocaleDateString('en-US', {
                         month: 'short',
                         year: 'numeric',
                       })}
@@ -132,7 +169,7 @@ export default function ChannelPage({ params }: ChannelPageProps) {
                 </div>
               </div>
 
-              <button className="btn-primary px-8">Subscribe</button>
+              <button className="btn-primary px-8 flex-shrink-0">Subscribe</button>
             </div>
 
             {/* Disclosure */}
@@ -147,8 +184,11 @@ export default function ChannelPage({ params }: ChannelPageProps) {
           <div>
             <h2 className="text-2xl font-bold mb-6">Videos ({videos.length})</h2>
             {videos.length === 0 ? (
-              <div className="text-center py-12 text-zinc-400">
-                <p>No videos yet. This creator is just getting started!</p>
+              <div className="card p-12 text-center">
+                <svg className="w-12 h-12 mx-auto text-zinc-700 mb-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M12 4v16m8-8H4" />
+                </svg>
+                <p className="text-zinc-400">No videos yet. This creator is just getting started!</p>
               </div>
             ) : (
               <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">

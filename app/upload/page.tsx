@@ -25,6 +25,7 @@ export default function UploadPage() {
   const [currentStep, setCurrentStep] = useState(1);
   const [loading, setLoading] = useState(true);
   const [uploading, setUploading] = useState(false);
+  const [dragOver, setDragOver] = useState(false);
 
   const [selectedFile, setSelectedFile] = useState<File | null>(null);
   const [formData, setFormData] = useState<UploadFormData>({
@@ -170,10 +171,11 @@ export default function UploadPage() {
       if (saveError) throw saveError;
 
       const videoId = (videoData as any)?.[0]?.id;
-      setUploadStatus('Upload complete! Redirecting...');
+      setUploadStatus('Success! Your video is being processed.');
+      setUploadProgress(100);
       setTimeout(() => {
         router.push(`/watch/${videoId}`);
-      }, 1500);
+      }, 2000);
     } catch (err: any) {
       alert(`Upload failed: ${err.message}`);
       setUploading(false);
@@ -219,15 +221,30 @@ export default function UploadPage() {
           <p className="text-zinc-400 mb-12">Share your AI-generated video with the world</p>
 
           {/* Progress Steps */}
-          <div className="flex gap-4 mb-12">
-            {[1, 2, 3].map((step) => (
-              <div
-                key={step}
-                className={`flex-1 h-2 rounded-full transition-colors ${
-                  step <= currentStep ? 'bg-violet-600' : 'bg-zinc-800'
-                }`}
-              />
-            ))}
+          <div className="mb-12">
+            <div className="flex items-center justify-between mb-4">
+              <p className="text-sm text-zinc-400">Step {currentStep} of 3</p>
+              <div className="flex gap-2">
+                {[1, 2, 3].map((step) => (
+                  <div
+                    key={step}
+                    className={`w-3 h-3 rounded-full transition-colors ${
+                      step <= currentStep ? 'bg-violet-600' : 'bg-zinc-800'
+                    }`}
+                  />
+                ))}
+              </div>
+            </div>
+            <div className="flex gap-2">
+              {[1, 2, 3].map((step) => (
+                <div
+                  key={step}
+                  className={`flex-1 h-1 rounded-full transition-colors ${
+                    step <= currentStep ? 'bg-violet-600' : 'bg-zinc-800'
+                  }`}
+                />
+              ))}
+            </div>
           </div>
 
           <form onSubmit={handleSubmit}>
@@ -236,7 +253,26 @@ export default function UploadPage() {
               <div className="card p-8 mb-8">
                 <h2 className="text-2xl font-bold mb-6">Step 1: Upload Video</h2>
 
-                <div className="border-2 border-dashed border-zinc-800 rounded-lg p-12 text-center mb-6 hover:border-violet-600 transition-colors">
+                <div
+                  onDragOver={(e) => {
+                    e.preventDefault();
+                    setDragOver(true);
+                  }}
+                  onDragLeave={() => setDragOver(false)}
+                  onDrop={(e) => {
+                    e.preventDefault();
+                    setDragOver(false);
+                    const file = e.dataTransfer.files?.[0];
+                    if (file && file.type.startsWith('video/')) {
+                      setSelectedFile(file);
+                    }
+                  }}
+                  className={`border-2 border-dashed rounded-xl p-12 text-center mb-6 transition-all duration-300 ${
+                    dragOver
+                      ? 'border-violet-600 bg-violet-600/5'
+                      : 'border-zinc-700 hover:border-violet-600'
+                  }`}
+                >
                   <input
                     type="file"
                     accept="video/*"

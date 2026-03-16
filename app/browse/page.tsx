@@ -5,6 +5,7 @@ import Link from 'next/link';
 import { Header } from '@/components/Header';
 import { Footer } from '@/components/Footer';
 import { VideoCard } from '@/components/VideoCard';
+import { VideoSkeletonGrid } from '@/components/VideoSkeleton';
 import { Video, Channel, VideoCategory } from '@/lib/types';
 import { getSupabase } from '@/lib/supabase';
 
@@ -64,6 +65,12 @@ export default function BrowsePage() {
 
       <main className="min-h-screen px-6 py-12">
         <div className="max-w-7xl mx-auto">
+          {/* Header */}
+          <div className="mb-8">
+            <h1 className="text-4xl font-bold mb-2">Browse Videos</h1>
+            <p className="text-zinc-400">Discover AI-generated content from creators worldwide</p>
+          </div>
+
           {/* Filters */}
           <div className="flex flex-col md:flex-row gap-8 mb-12">
             {/* Category filter */}
@@ -72,10 +79,10 @@ export default function BrowsePage() {
               <div className="flex flex-wrap gap-2">
                 <button
                   onClick={() => setSelectedCategory('all')}
-                  className={`px-4 py-2 rounded-lg font-medium transition-colors ${
+                  className={`px-4 py-2 rounded-full font-medium transition-all duration-200 text-sm ${
                     selectedCategory === 'all'
                       ? 'bg-violet-600 text-white'
-                      : 'bg-zinc-900 text-zinc-400 hover:text-white border border-zinc-800'
+                      : 'bg-zinc-800 text-zinc-400 hover:bg-zinc-700'
                   }`}
                 >
                   All
@@ -84,10 +91,10 @@ export default function BrowsePage() {
                   <button
                     key={cat}
                     onClick={() => setSelectedCategory(cat)}
-                    className={`px-4 py-2 rounded-lg font-medium transition-colors capitalize ${
+                    className={`px-4 py-2 rounded-full font-medium transition-all duration-200 text-sm capitalize ${
                       selectedCategory === cat
                         ? 'bg-violet-600 text-white'
-                        : 'bg-zinc-900 text-zinc-400 hover:text-white border border-zinc-800'
+                        : 'bg-zinc-800 text-zinc-400 hover:bg-zinc-700'
                     }`}
                   >
                     {cat}
@@ -102,7 +109,7 @@ export default function BrowsePage() {
               <select
                 value={sortBy}
                 onChange={(e) => setSortBy(e.target.value as 'latest' | 'views' | 'featured')}
-                className="input-field bg-zinc-900 border border-zinc-800"
+                className="input-field"
               >
                 <option value="latest">Latest</option>
                 <option value="views">Most Viewed</option>
@@ -113,14 +120,19 @@ export default function BrowsePage() {
 
           {/* Videos Grid */}
           {loading ? (
-            <div className="text-center py-20">
-              <p className="text-zinc-400">Loading videos...</p>
-            </div>
+            <VideoSkeletonGrid />
           ) : videos.length === 0 ? (
-            <div className="text-center py-20">
-              <p className="text-zinc-400 mb-4">No videos found in this category.</p>
-              <Link href="/" className="text-violet-400 hover:text-violet-300">
-                ← Back to home
+            <div className="card p-12 text-center">
+              <div className="mb-6">
+                <svg className="w-16 h-16 mx-auto text-zinc-700" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M14.752 11.168l-3.197-2.132A1 1 0 0010 9.87v4.263a1 1 0 001.555.832l3.197-2.132a1 1 0 000-1.664z" />
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                </svg>
+              </div>
+              <h3 className="text-xl font-bold mb-2">No videos yet</h3>
+              <p className="text-zinc-400 mb-6">Be the first AI creator to upload content in this category.</p>
+              <Link href="/register" className="btn-primary inline-block">
+                Start Your Channel
               </Link>
             </div>
           ) : (

@@ -72,8 +72,9 @@ export default function RegisterPage() {
         }
       }
 
-      // Redirect to login
-      router.push('/login?registered=true');
+      // Auto-redirect to dashboard (user will be logged in after email verification)
+      // For now, redirect to login and then dashboard will check auth
+      router.push('/login');
     } catch (err: any) {
       setError(err.message || 'An error occurred');
     } finally {
