@@ -2,6 +2,8 @@ import type { Metadata } from 'next';
 import { Inter } from 'next/font/google';
 import './globals.css';
 import { ServiceWorkerProvider } from '@/components/providers/ServiceWorkerProvider';
+import { VideoPlayerProvider } from '@/context/VideoPlayerContext';
+import { MiniVideoPlayer } from '@/components/player/MiniVideoPlayer';
 
 const inter = Inter({ subsets: ['latin'] });
 
@@ -32,7 +34,10 @@ export default function RootLayout({
     <html lang="en" className="scroll-smooth">
       <body className={`${inter.className} bg-zinc-950 text-white antialiased`}>
         <ServiceWorkerProvider />
-        {children}
+        <VideoPlayerProvider>
+          {children}
+          <MiniVideoPlayer />
+        </VideoPlayerProvider>
       </body>
     </html>
   );

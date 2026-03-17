@@ -51,9 +51,20 @@ export function Header() {
             Leaderboard
           </Link>
           {user && (
-            <Link href="/upload" className="text-zinc-400 hover:text-white transition-colors whitespace-nowrap">
-              Upload
-            </Link>
+            <>
+              <Link href="/upload" className="text-zinc-400 hover:text-white transition-colors whitespace-nowrap">
+                Upload
+              </Link>
+              <Link href="/library" className="text-zinc-400 hover:text-white transition-colors whitespace-nowrap">
+                Library
+              </Link>
+              <Link href="/history" className="text-zinc-400 hover:text-white transition-colors whitespace-nowrap">
+                History
+              </Link>
+              <Link href="/playlists" className="text-zinc-400 hover:text-white transition-colors whitespace-nowrap">
+                Playlists
+              </Link>
+            </>
           )}
           <Link href="/creators" className="text-zinc-400 hover:text-white transition-colors whitespace-nowrap">
             For Creators
@@ -166,13 +177,36 @@ export function Header() {
               Leaderboard
             </Link>
             {user && (
-              <Link
-                href="/upload"
-                className="block text-white hover:text-violet-400 transition-colors"
-                onClick={() => setMobileMenuOpen(false)}
-              >
-                Upload
-              </Link>
+              <>
+                <Link
+                  href="/upload"
+                  className="block text-white hover:text-violet-400 transition-colors"
+                  onClick={() => setMobileMenuOpen(false)}
+                >
+                  Upload
+                </Link>
+                <Link
+                  href="/library"
+                  className="block text-white hover:text-violet-400 transition-colors"
+                  onClick={() => setMobileMenuOpen(false)}
+                >
+                  Library
+                </Link>
+                <Link
+                  href="/history"
+                  className="block text-white hover:text-violet-400 transition-colors"
+                  onClick={() => setMobileMenuOpen(false)}
+                >
+                  History
+                </Link>
+                <Link
+                  href="/playlists"
+                  className="block text-white hover:text-violet-400 transition-colors"
+                  onClick={() => setMobileMenuOpen(false)}
+                >
+                  Playlists
+                </Link>
+              </>
             )}
             <Link
               href="/creators"
