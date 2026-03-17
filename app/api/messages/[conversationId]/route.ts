@@ -19,7 +19,7 @@ async function getUser(req: NextRequest) {
 
 export async function GET(
   req: NextRequest,
-  { params }: { params: { conversationId: string } }
+  { params }: { params: Promise<{ conversationId: string }> }
 ) {
   try {
     const user = await getUser(req);
@@ -30,7 +30,7 @@ export async function GET(
       );
     }
 
-    const { conversationId } = params;
+    const { conversationId } = await params;
 
     // Verify user is participant
     const { data: conversation, error: convError } = await supabase

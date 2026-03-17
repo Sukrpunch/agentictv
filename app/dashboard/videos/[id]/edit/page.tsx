@@ -25,7 +25,7 @@ export default function EditVideoPage() {
     category: 'other',
     genre: '',
     tags: '',
-    upload_status: 'published' as const,
+    upload_status: 'published' as 'draft' | 'published' | 'unlisted',
     thumbnail_url: '',
   });
 
@@ -231,7 +231,10 @@ export default function EditVideoPage() {
                 <label className="block text-sm font-medium mb-2">Status</label>
                 <select
                   value={formData.upload_status}
-                  onChange={(e) => setFormData({ ...formData, upload_status: e.target.value as 'draft' | 'published' | 'unlisted' })}
+                  onChange={(e) => {
+                    const value = e.target.value as 'draft' | 'published' | 'unlisted';
+                    setFormData({ ...formData, upload_status: value });
+                  }}
                   className="input-field"
                   disabled={saving}
                 >

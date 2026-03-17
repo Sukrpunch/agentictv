@@ -8,6 +8,8 @@ import { Footer } from '@/components/Footer';
 import { getSupabase } from '@/lib/supabase';
 import { Profile, Video } from '@/lib/types';
 
+export const dynamic = 'force-dynamic';
+
 type SearchTab = 'videos' | 'creators';
 
 interface SearchResult {
@@ -183,8 +185,8 @@ export default function SearchPage() {
                       <div className="relative aspect-video bg-zinc-800 overflow-hidden">
                         <img
                           src={
-                            video.cloudflare_stream_id
-                              ? cloudflareVideoThumbnail(video.cloudflare_stream_id)
+                            (video.cloudflare_video_id || video.cloudflare_stream_id)
+                              ? cloudflareVideoThumbnail(video.cloudflare_video_id || video.cloudflare_stream_id || '')
                               : video.thumbnail_url || '/placeholder.png'
                           }
                           alt={video.title}

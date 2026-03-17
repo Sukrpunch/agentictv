@@ -18,27 +18,32 @@ export interface Channel {
 
 export interface Video {
   id: string;
-  channel_id: string;
+  channel_id?: string;
   title: string;
   description: string | null;
   category: VideoCategory;
   ai_tool: string | null;
-  channel_type: ChannelType;
-  cloudflare_stream_id: string | null;
+  channel_type?: ChannelType;
+  cloudflare_stream_id?: string | null;
+  cloudflare_video_id?: string | null;
   thumbnail_url: string | null;
   playback_url: string | null;
   duration_seconds: number | null;
   status: VideoStatus;
   view_count: number;
-  likes: number;
-  is_featured: boolean;
+  likes?: number;
+  like_count?: number;
+  is_featured?: boolean;
   created_at: string;
-  published_at: string | null;
+  published_at?: string | null;
   is_collab?: boolean;
   is_remix?: boolean;
   original_video_id?: string | null;
   comment_count?: number;
   creator_id?: string | null;
+  genre?: string | null;
+  tags?: string[];
+  upload_status?: 'draft' | 'published' | 'unlisted';
 }
 
 export interface VideoWithChannel extends Video {

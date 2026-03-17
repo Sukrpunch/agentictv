@@ -1,12 +1,9 @@
 'use client';
 
-import { useState, useEffect, useRef, Suspense } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import Link from 'next/link';
-import { useRouter } from 'next/navigation';
-import { Header } from '@/components/Header';
-import { Footer } from '@/components/Footer';
+import { useRouter, useSearchParams } from 'next/navigation';
 import { getSupabase } from '@/lib/supabase';
-import { MessageThreadContent } from './MessageThreadContent';
 
 interface Message {
   id: string;
@@ -26,7 +23,7 @@ interface Conversation {
   participant_2: string;
 }
 
-export default function MessageThreadPage({
+export function MessageThreadContent({
   params,
 }: {
   params: { conversationId: string };
