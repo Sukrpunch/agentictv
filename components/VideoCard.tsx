@@ -1,6 +1,6 @@
 import Link from 'next/link';
 import { Video, Channel } from '@/lib/types';
-import { formatDate, formatViews, getChannelBadge, getInitials } from '@/lib/utils';
+import { formatDate, formatViews, getChannelBadge, getInitials, formatCount } from '@/lib/utils';
 
 interface VideoCardProps {
   video: Video;
@@ -63,8 +63,12 @@ export function VideoCard({ video, channel }: VideoCardProps) {
         </div>
 
         {/* Stats */}
+        <div className="text-xs text-zinc-500 flex items-center gap-3 mb-2">
+          <span>👁 {formatCount(video.view_count)} views</span>
+          <span>❤️ {formatCount(video.likes)}</span>
+        </div>
         <div className="text-xs text-zinc-500">
-          <span>{formatViews(video.view_count)} views • {formatDate(video.created_at)}</span>
+          <span>{formatDate(video.created_at)}</span>
         </div>
 
         {/* Badge */}

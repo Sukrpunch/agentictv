@@ -11,31 +11,30 @@ export async function POST(request: NextRequest) {
 
     const supabase = getSupabaseAdmin();
 
-    // Increment view count
-    const { data, error } = await supabase
+    // Increment view count and get new count
+    const { data: currentVideo } = await supabase
       .from('videos')
-      .update({ view_count: supabase.rpc('increment_views') })
+      .select('view_count')
       .eq('id', videoId)
-      .select();
+      .single();
+
+    if (!currentVideo) {
+      return NextResponse.json({ error: 'Video not found' }, { status: 404 });
+    }
+
+    const newViewCount = (currentVideo.view_count || 0) + 1;
+
+    const { error } = await supabase
+      .from('videos')
+      .update({ view_count: newViewCount })
+      .eq('id', videoId);
 
     if (error) {
       console.error('Error incrementing views:', error);
-      // Fallback: manually increment
-      const { data: videoData } = await supabase
-        .from('videos')
-        .select('view_count')
-        .eq('id', videoId)
-        .single();
-
-      if (videoData) {
-        await supabase
-          .from('videos')
-          .update({ view_count: (videoData.view_count || 0) + 1 })
-          .eq('id', videoId);
-      }
+      return NextResponse.json({ error: error.message }, { status: 500 });
     }
 
-    return NextResponse.json({ success: true });
+    return NextResponse.json({ success: true, views: newViewCount });
   } catch (error: any) {
     console.error('View tracking error:', error);
     return NextResponse.json({ error: error.message }, { status: 500 });

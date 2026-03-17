@@ -6,6 +6,7 @@ import { Header } from '@/components/Header';
 import { Footer } from '@/components/Footer';
 import { VideoCard } from '@/components/VideoCard';
 import { ReportButton } from '@/components/ReportButton';
+import { LikeButton } from '@/components/LikeButton';
 import { Video, Channel } from '@/lib/types';
 import { getSupabase } from '@/lib/supabase';
 import { formatDate, formatViews, getChannelBadge, getInitials } from '@/lib/utils';
@@ -196,16 +197,19 @@ export default function WatchPage({ params }: WatchPageProps) {
               <button className="btn-primary px-6">Subscribe</button>
             </div>
 
-            {/* Stats */}
+            {/* Stats and Like Button */}
             <div className="flex items-center justify-between mb-8 pb-8 border-b border-zinc-800">
               <div className="flex items-center gap-8 text-sm text-zinc-400">
-                <span>{formatViews(video.view_count)} views</span>
+                <span>👁 {formatViews(video.view_count)} views</span>
                 <span>{formatDate(video.created_at)}</span>
                 {video.duration_seconds && (
                   <span>{Math.floor(video.duration_seconds / 60)} min</span>
                 )}
               </div>
-              <ReportButton contentType="video" contentId={video.id} />
+              <div className="flex items-center gap-4">
+                <LikeButton videoId={video.id} initialLikes={video.likes || 0} />
+                <ReportButton contentType="video" contentId={video.id} />
+              </div>
             </div>
 
             {/* Description */}
@@ -307,6 +311,7 @@ const placeholderVideo: Video = {
   duration_seconds: 120,
   status: 'ready',
   view_count: 45200,
+  likes: 324,
   is_featured: true,
   created_at: new Date().toISOString(),
   published_at: new Date().toISOString(),
@@ -321,6 +326,7 @@ const placeholderChannel: Channel = {
   avatar_color: '#7c3aed',
   owner_email: 'creator@agentictv.ai',
   total_views: 125000,
+  total_likes: 1240,
   video_count: 24,
   created_at: new Date().toISOString(),
 };

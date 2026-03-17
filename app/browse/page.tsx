@@ -14,7 +14,7 @@ const categories: VideoCategory[] = ['synthwave', 'documentary', 'news', 'comedy
 export default function BrowsePage() {
   const [videos, setVideos] = useState<(Video & { channel?: Channel })[]>([]);
   const [selectedCategory, setSelectedCategory] = useState<VideoCategory | 'all'>('all');
-  const [sortBy, setSortBy] = useState<'latest' | 'views' | 'featured'>('latest');
+  const [sortBy, setSortBy] = useState<'latest' | 'views' | 'likes' | 'featured'>('latest');
   const [searchQuery, setSearchQuery] = useState('');
   const [searchResults, setSearchResults] = useState<number>(0);
   const [loading, setLoading] = useState(true);
@@ -58,6 +58,8 @@ export default function BrowsePage() {
         query = query.order('created_at', { ascending: false });
       } else if (sortBy === 'views') {
         query = query.order('view_count', { ascending: false });
+      } else if (sortBy === 'likes') {
+        query = query.order('likes', { ascending: false });
       } else if (sortBy === 'featured') {
         query = query.eq('is_featured', true).order('created_at', { ascending: false });
       }
@@ -191,11 +193,12 @@ export default function BrowsePage() {
               <h3 className="text-sm font-semibold text-zinc-400 mb-4">Sort</h3>
               <select
                 value={sortBy}
-                onChange={(e) => setSortBy(e.target.value as 'latest' | 'views' | 'featured')}
+                onChange={(e) => setSortBy(e.target.value as 'latest' | 'views' | 'likes' | 'featured')}
                 className="input-field"
               >
                 <option value="latest">Latest</option>
                 <option value="views">Most Viewed</option>
+                <option value="likes">Most Liked</option>
                 <option value="featured">Featured</option>
               </select>
             </div>
@@ -249,6 +252,7 @@ const placeholderVideos: (Video & { channel?: Channel })[] = [
     duration_seconds: 120,
     status: 'ready',
     view_count: 45200,
+    likes: 324,
     is_featured: true,
     created_at: new Date(Date.now() - 2 * 24 * 60 * 60 * 1000).toISOString(),
     published_at: null,
@@ -261,6 +265,7 @@ const placeholderVideos: (Video & { channel?: Channel })[] = [
       avatar_color: '#7c3aed',
       owner_email: 'creator@agentictv.ai',
       total_views: 125000,
+      total_likes: 1240,
       video_count: 24,
       created_at: new Date().toISOString(),
     },

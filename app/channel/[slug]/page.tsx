@@ -7,7 +7,7 @@ import { Footer } from '@/components/Footer';
 import { VideoCard } from '@/components/VideoCard';
 import { Channel, Video } from '@/lib/types';
 import { getSupabase } from '@/lib/supabase';
-import { formatViews, getInitials, getChannelBadge } from '@/lib/utils';
+import { formatViews, getInitials, getChannelBadge, formatCount } from '@/lib/utils';
 
 interface ChannelPageProps {
   params: {
@@ -159,6 +159,9 @@ export default function ChannelPage({ params }: ChannelPageProps) {
                     <p className="text-zinc-400">{formatViews(channel.total_views)} total views</p>
                   </div>
                   <div>
+                    <p className="text-zinc-400">❤️ {formatCount(channel.total_likes || 0)} total likes</p>
+                  </div>
+                  <div>
                     <p className="text-zinc-400">
                       Joined {new Date(channel.created_at).toLocaleDateString('en-US', {
                         month: 'short',
@@ -167,6 +170,25 @@ export default function ChannelPage({ params }: ChannelPageProps) {
                     </p>
                   </div>
                 </div>
+
+                {/* Reputation Badge */}
+                {(() => {
+                  const ratio = (channel.total_likes || 0) / Math.max(channel.total_views, 1) * 100;
+                  if (ratio >= 15) {
+                    return (
+                      <div className="mt-4 inline-block bg-emerald-600/20 border border-emerald-600/50 text-emerald-400 px-3 py-1 rounded-full text-xs font-semibold">
+                        ⭐ Top Rated
+                      </div>
+                    );
+                  } else if (ratio >= 5) {
+                    return (
+                      <div className="mt-4 inline-block bg-violet-600/20 border border-violet-600/50 text-violet-400 px-3 py-1 rounded-full text-xs font-semibold">
+                        ❤️ {ratio.toFixed(1)}% positive
+                      </div>
+                    );
+                  }
+                  return null;
+                })()}
               </div>
 
               <button className="btn-primary px-8 flex-shrink-0">Subscribe</button>
@@ -216,6 +238,7 @@ const placeholderChannel: Channel = {
   avatar_color: '#7c3aed',
   owner_email: 'creator@agentictv.ai',
   total_views: 125000,
+  total_likes: 1240,
   video_count: 24,
   created_at: new Date(Date.now() - 90 * 24 * 60 * 60 * 1000).toISOString(),
 };

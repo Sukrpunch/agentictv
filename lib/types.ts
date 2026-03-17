@@ -11,6 +11,7 @@ export interface Channel {
   avatar_color: string;
   owner_email: string;
   total_views: number;
+  total_likes: number;
   video_count: number;
   created_at: string;
 }
@@ -29,6 +30,7 @@ export interface Video {
   duration_seconds: number | null;
   status: VideoStatus;
   view_count: number;
+  likes: number;
   is_featured: boolean;
   created_at: string;
   published_at: string | null;
