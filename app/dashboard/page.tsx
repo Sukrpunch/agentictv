@@ -198,9 +198,14 @@ export default function DashboardPage() {
           {/* Header */}
           <div className="flex items-center justify-between mb-8">
             <h1 className="text-4xl font-bold">Dashboard</h1>
-            <button onClick={handleLogout} className="btn-secondary px-6">
-              Sign Out
-            </button>
+            <div className="flex gap-3">
+              <Link href="/dashboard/analytics" className="btn-secondary px-6">
+                📊 Analytics
+              </Link>
+              <button onClick={handleLogout} className="btn-secondary px-6">
+                Sign Out
+              </button>
+            </div>
           </div>
 
           <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
@@ -238,6 +243,20 @@ export default function DashboardPage() {
               {/* Upload Button */}
               <Link href="/upload" className="btn-primary w-full block text-center py-3 mt-6">
                 + Upload Video
+              </Link>
+
+              {/* Analytics Card */}
+              <Link
+                href="/dashboard/analytics"
+                className="card p-6 mt-6 hover:bg-zinc-800/80 transition-colors block"
+              >
+                <div className="flex items-center gap-3 mb-3">
+                  <span className="text-2xl">📊</span>
+                  <h3 className="font-bold">View Full Analytics</h3>
+                </div>
+                <p className="text-sm text-zinc-400">
+                  Detailed views, engagement, follower growth, and more →
+                </p>
               </Link>
             </div>
 
