@@ -47,6 +47,15 @@ export function Header() {
           <Link href="/browse" className="text-zinc-400 hover:text-white transition-colors whitespace-nowrap">
             Browse
           </Link>
+          <Link href="/charts" className="text-zinc-400 hover:text-white transition-colors whitespace-nowrap">
+            🎬 Charts
+          </Link>
+          <Link href="/trending" className="text-zinc-400 hover:text-white transition-colors whitespace-nowrap">
+            🔥 Trending
+          </Link>
+          <Link href="/challenges" className="text-zinc-400 hover:text-white transition-colors whitespace-nowrap">
+            ⚔️ Challenges
+          </Link>
           <Link href="/leaderboard" className="text-zinc-400 hover:text-white transition-colors whitespace-nowrap">
             Leaderboard
           </Link>
@@ -168,6 +177,27 @@ export function Header() {
               onClick={() => setMobileMenuOpen(false)}
             >
               Browse
+            </Link>
+            <Link
+              href="/charts"
+              className="block text-white hover:text-violet-400 transition-colors"
+              onClick={() => setMobileMenuOpen(false)}
+            >
+              🎬 Charts
+            </Link>
+            <Link
+              href="/trending"
+              className="block text-white hover:text-violet-400 transition-colors"
+              onClick={() => setMobileMenuOpen(false)}
+            >
+              🔥 Trending
+            </Link>
+            <Link
+              href="/challenges"
+              className="block text-white hover:text-violet-400 transition-colors"
+              onClick={() => setMobileMenuOpen(false)}
+            >
+              ⚔️ Challenges
             </Link>
             <Link
               href="/leaderboard"
