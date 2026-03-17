@@ -5,6 +5,7 @@ import Link from 'next/link';
 import { getSupabase } from '@/lib/supabase';
 import { NotificationBell } from './notifications/NotificationBell';
 import { MessagesIcon } from './social/MessagesIcon';
+import { PushPermissionPrompt } from './notifications/PushPermissionPrompt';
 
 export function Header() {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
@@ -134,6 +135,7 @@ export function Header() {
           </div>
         </div>
       )}
+      <PushPermissionPrompt />
     </header>
   );
 }

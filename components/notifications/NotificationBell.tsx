@@ -37,12 +37,30 @@ export function NotificationBell() {
         setUser(authUser);
         fetchNotifications(authUser.id);
         
-        // Poll every 60 seconds
-        const interval = setInterval(() => {
-          fetchNotifications(authUser.id);
-        }, 60000);
+        // Subscribe to real-time notifications
+        const channel = supabase
+          .channel(`notifications:${authUser.id}`)
+          .on(
+            'postgres_changes',
+            {
+              event: 'INSERT',
+              schema: 'public',
+              table: 'notifications',
+              filter: `user_id=eq.${authUser.id}`,
+            },
+            (payload) => {
+              const newNotif = payload.new as Notification;
+              setNotifications(prev => [newNotif, ...prev.slice(0, 19)]);
+              setUnreadCount(prev => prev + 1);
+            }
+          )
+          .subscribe();
+
+        setLoading(false);
         
-        return () => clearInterval(interval);
+        return () => {
+          supabase.removeChannel(channel);
+        };
       }
       
       setLoading(false);

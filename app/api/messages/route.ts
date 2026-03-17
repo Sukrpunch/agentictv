@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { createClient } from '@supabase/supabase-js';
+import { sendPushToUser } from '@/lib/push/sendPush';
 
 const supabase = createClient(
   process.env.NEXT_PUBLIC_SUPABASE_URL!,
@@ -172,7 +173,7 @@ export async function POST(req: NextRequest) {
     // Create notification for recipient
     const { data: senderProfile } = await supabase
       .from('profiles')
-      .select('display_name')
+      .select('display_name, username')
       .eq('id', user.id)
       .single();
 
@@ -186,6 +187,13 @@ export async function POST(req: NextRequest) {
         entity_type: 'message',
         message: (senderProfile?.display_name || 'Someone') + ' sent you a message',
       });
+
+    // Send push notification
+    await sendPushToUser(recipient_id, {
+      title: 'AgenticTV',
+      body: (senderProfile?.display_name || 'Someone') + ' sent you a message',
+      url: `/messages/${conversation.id}`,
+    });
 
     return NextResponse.json({
       message,

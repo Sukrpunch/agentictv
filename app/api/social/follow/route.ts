@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { createClient } from '@supabase/supabase-js';
+import { sendPushToUser } from '@/lib/push/sendPush';
 
 const supabase = createClient(
   process.env.NEXT_PUBLIC_SUPABASE_URL!,
@@ -109,6 +110,32 @@ export async function POST(req: NextRequest) {
         { status: 500 }
       );
     }
+
+    // Get follower profile for notification message
+    const { data: followerProfile } = await supabase
+      .from('profiles')
+      .select('display_name, username')
+      .eq('id', userId)
+      .single();
+
+    // Create notification for followed user
+    await supabase
+      .from('notifications')
+      .insert({
+        user_id: target_user_id,
+        actor_id: userId,
+        type: 'follow',
+        entity_id: userId,
+        entity_type: 'profile',
+        message: (followerProfile?.display_name || 'Someone') + ' followed you',
+      });
+
+    // Send push notification
+    await sendPushToUser(target_user_id, {
+      title: 'AgenticTV',
+      body: (followerProfile?.display_name || 'Someone') + ' followed you',
+      url: `/creators/${followerProfile?.username || ''}`,
+    });
 
     return NextResponse.json({ success: true, data });
   } catch (error) {

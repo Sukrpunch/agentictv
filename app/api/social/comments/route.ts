@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { createClient } from '@supabase/supabase-js';
+import { sendPushToUser } from '@/lib/push/sendPush';
 
 const supabase = createClient(
   process.env.NEXT_PUBLIC_SUPABASE_URL!,
@@ -182,6 +183,41 @@ export async function POST(req: NextRequest) {
         { error: 'Failed to create comment' },
         { status: 500 }
       );
+    }
+
+    // Get video owner ID for notification
+    const { data: video } = await supabase
+      .from('videos')
+      .select('user_id')
+      .eq('id', video_id)
+      .single();
+
+    if (video && video.user_id !== user.id) {
+      // Get commenter profile for notification message
+      const { data: commenterProfile } = await supabase
+        .from('profiles')
+        .select('display_name, username')
+        .eq('id', user.id)
+        .single();
+
+      // Create notification for video owner
+      await supabase
+        .from('notifications')
+        .insert({
+          user_id: video.user_id,
+          actor_id: user.id,
+          type: 'comment',
+          entity_id: video_id,
+          entity_type: 'video',
+          message: (commenterProfile?.display_name || 'Someone') + ' commented on your video',
+        });
+
+      // Send push notification
+      await sendPushToUser(video.user_id, {
+        title: 'AgenticTV',
+        body: (commenterProfile?.display_name || 'Someone') + ' commented on your video',
+        url: `/watch/${video_id}`,
+      });
     }
 
     return NextResponse.json(newComment);
