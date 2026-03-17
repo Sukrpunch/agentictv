@@ -62,6 +62,15 @@ export function Header() {
           <Link href="/breakdown" className="text-zinc-400 hover:text-white transition-colors whitespace-nowrap">
             📊 Breakdown
           </Link>
+          <Link href="/events" className="text-zinc-400 hover:text-white transition-colors whitespace-nowrap">
+            🎬 Events
+          </Link>
+          <Link href="/prompts" className="text-zinc-400 hover:text-white transition-colors whitespace-nowrap">
+            📝 Prompts
+          </Link>
+          <Link href="/community-channels" className="text-zinc-400 hover:text-white transition-colors whitespace-nowrap">
+            📺 Channels
+          </Link>
           {user && (
             <>
               <Link href="/upload" className="text-zinc-400 hover:text-white transition-colors whitespace-nowrap">
@@ -215,6 +224,27 @@ export function Header() {
               onClick={() => setMobileMenuOpen(false)}
             >
               📊 Breakdown
+            </Link>
+            <Link
+              href="/events"
+              className="block text-white hover:text-violet-400 transition-colors"
+              onClick={() => setMobileMenuOpen(false)}
+            >
+              🎬 Events
+            </Link>
+            <Link
+              href="/prompts"
+              className="block text-white hover:text-violet-400 transition-colors"
+              onClick={() => setMobileMenuOpen(false)}
+            >
+              📝 Prompts
+            </Link>
+            <Link
+              href="/community-channels"
+              className="block text-white hover:text-violet-400 transition-colors"
+              onClick={() => setMobileMenuOpen(false)}
+            >
+              📺 Channels
             </Link>
             {user && (
               <>

@@ -21,6 +21,12 @@ interface UploadFormData {
   originalVideoTitle: string;
   originalVideoUrl: string;
   status: 'draft' | 'published';
+  // Prompt Archive fields
+  sharePrompt: boolean;
+  promptTool: string;
+  promptToolVersion: string;
+  promptText: string;
+  promptSettings: string;
 }
 
 export default function UploadPage() {
@@ -47,10 +53,21 @@ export default function UploadPage() {
     originalVideoTitle: '',
     originalVideoUrl: '',
     status: 'published',
+    sharePrompt: false,
+    promptTool: 'Runway',
+    promptToolVersion: '',
+    promptText: '',
+    promptSettings: '',
   });
 
   const [uploadProgress, setUploadProgress] = useState(0);
   const [uploadStatus, setUploadStatus] = useState('');
+  const [autoTagLoading, setAutoTagLoading] = useState(false);
+  const [tagSuggestions, setTagSuggestions] = useState<{
+    genre: string;
+    mood: string;
+    tags: string[];
+  } | null>(null);
 
   useEffect(() => {
     async function checkAuth() {
@@ -122,6 +139,44 @@ export default function UploadPage() {
       ...prev,
       [name]: value,
     }));
+  };
+
+  const handleAutoTag = async () => {
+    if (!formData.title.trim()) {
+      alert('Please enter a title first');
+      return;
+    }
+
+    setAutoTagLoading(true);
+    try {
+      const response = await fetch('/api/videos/auto-tag', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          title: formData.title,
+          description: formData.description,
+        }),
+      });
+
+      if (!response.ok) {
+        throw new Error('Failed to generate suggestions');
+      }
+
+      const suggestions = await response.json();
+      setTagSuggestions(suggestions);
+
+      // Auto-fill the fields
+      setFormData((prev) => ({
+        ...prev,
+        genre: suggestions.genre,
+        tags: suggestions.tags.join(', '),
+      }));
+    } catch (error) {
+      console.error('Auto-tag error:', error);
+      alert('Failed to generate tag suggestions');
+    } finally {
+      setAutoTagLoading(false);
+    }
   };
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -220,6 +275,43 @@ export default function UploadPage() {
       }
 
       const { video } = await createResponse.json();
+
+      // Step 5: Save prompt if user chose to share it
+      if (formData.sharePrompt && formData.promptText.trim()) {
+        setUploadStatus('Saving prompt...');
+        try {
+          const promptData = {
+            video_id: video.id,
+            tool: formData.promptTool,
+            tool_version: formData.promptToolVersion || null,
+            prompt: formData.promptText,
+            settings: formData.promptSettings ? Object.fromEntries(
+              formData.promptSettings.split(',').map(s => {
+                const [key, value] = s.split(':').map(x => x.trim());
+                return [key, value];
+              })
+            ) : {},
+            genre: formData.genre || null,
+            tags: formData.tags ? formData.tags.split(',').map((t) => t.trim()) : [],
+            is_public: true,
+          };
+
+          const promptResponse = await fetch('/api/prompts', {
+            method: 'POST',
+            headers: {
+              'Content-Type': 'application/json',
+              'Authorization': `Bearer ${session?.access_token}`,
+            },
+            body: JSON.stringify(promptData),
+          });
+
+          if (!promptResponse.ok) {
+            console.warn('Failed to save prompt, but video was saved successfully');
+          }
+        } catch (promptError) {
+          console.warn('Prompt save error (non-critical):', promptError);
+        }
+      }
 
       setUploadProgress(100);
       setUploadStatus('✓ Video uploaded successfully!');
@@ -463,6 +555,36 @@ export default function UploadPage() {
                     />
                   </div>
 
+                  {/* Auto-Tag Button */}
+                  <div className="bg-violet-600/10 border border-violet-600/30 rounded-lg p-4">
+                    <div className="flex items-center justify-between">
+                      <div>
+                        <p className="font-semibold text-violet-300 mb-1">✨ Mason's AI Auto-Tagger</p>
+                        <p className="text-sm text-zinc-400">Analyze your video title and description to suggest genre, mood, and tags</p>
+                      </div>
+                      <button
+                        type="button"
+                        onClick={handleAutoTag}
+                        disabled={autoTagLoading || !formData.title.trim()}
+                        className="px-4 py-2 bg-violet-600 text-white rounded-lg font-semibold hover:bg-violet-700 transition-colors disabled:opacity-50 whitespace-nowrap ml-4"
+                      >
+                        {autoTagLoading ? 'Analyzing...' : '✨ Auto-Tag'}
+                      </button>
+                    </div>
+                    {tagSuggestions && (
+                      <div className="mt-4 pt-4 border-t border-violet-600/30 space-y-3">
+                        <div>
+                          <p className="text-sm text-zinc-400 mb-2">Suggested Mood:</p>
+                          <div className="flex flex-wrap gap-2">
+                            <span className="px-3 py-1 bg-violet-600/20 text-violet-300 rounded-full text-sm font-medium">
+                              {tagSuggestions.mood}
+                            </span>
+                          </div>
+                        </div>
+                      </div>
+                    )}
+                  </div>
+
                   {/* Category & Genre */}
                   <div className="grid grid-cols-2 gap-4">
                     <div>
@@ -578,6 +700,89 @@ export default function UploadPage() {
                       </div>
                     </>
                   )}
+
+                  {/* Prompt Sharing */}
+                  <div className="border-t border-zinc-800 pt-6">
+                    <label className="flex items-center gap-3 mb-4">
+                      <input
+                        type="checkbox"
+                        name="sharePrompt"
+                        checked={formData.sharePrompt}
+                        onChange={(e) =>
+                          setFormData((prev) => ({
+                            ...prev,
+                            sharePrompt: e.target.checked,
+                          }))
+                        }
+                        disabled={uploading}
+                        className="w-4 h-4"
+                      />
+                      <span className="font-medium">📝 Share Your AI Prompt (optional)</span>
+                    </label>
+                    <p className="text-sm text-zinc-400 mb-4">
+                      Help other creators by sharing the prompt you used with your AI video tool.
+                    </p>
+
+                    {formData.sharePrompt && (
+                      <div className="space-y-4 bg-zinc-900/50 p-4 rounded-lg">
+                        <div>
+                          <label className="block text-sm font-medium mb-2">AI Tool Used</label>
+                          <select
+                            name="promptTool"
+                            value={formData.promptTool}
+                            onChange={handleFormChange}
+                            className="input-field"
+                            disabled={uploading}
+                          >
+                            <option>Runway</option>
+                            <option>Sora</option>
+                            <option>Kling</option>
+                            <option>Pika</option>
+                            <option>Midjourney</option>
+                            <option>Other</option>
+                          </select>
+                        </div>
+
+                        <div>
+                          <label className="block text-sm font-medium mb-2">Tool Version (optional)</label>
+                          <input
+                            type="text"
+                            name="promptToolVersion"
+                            value={formData.promptToolVersion}
+                            onChange={handleFormChange}
+                            className="input-field"
+                            placeholder="e.g. Gen-3, v2.1"
+                            disabled={uploading}
+                          />
+                        </div>
+
+                        <div>
+                          <label className="block text-sm font-medium mb-2">Your Prompt Text</label>
+                          <textarea
+                            name="promptText"
+                            value={formData.promptText}
+                            onChange={handleFormChange}
+                            className="input-field h-24 resize-none"
+                            placeholder="Paste the exact prompt you used to generate this video..."
+                            disabled={uploading}
+                          />
+                        </div>
+
+                        <div>
+                          <label className="block text-sm font-medium mb-2">Settings (optional)</label>
+                          <input
+                            type="text"
+                            name="promptSettings"
+                            value={formData.promptSettings}
+                            onChange={handleFormChange}
+                            className="input-field"
+                            placeholder="e.g. resolution: 1080p, duration: 15s, style: cinematic"
+                            disabled={uploading}
+                          />
+                        </div>
+                      </div>
+                    )}
+                  </div>
                 </div>
 
                 <div className="flex gap-4 mt-8">
