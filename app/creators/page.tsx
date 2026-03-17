@@ -254,6 +254,40 @@ export default function CreatorsPage() {
           </div>
         </section>
 
+        {/* $AGNT TOKEN REWARDS */}
+        <section className="py-20 border-t border-zinc-800">
+          <div className="max-w-4xl mx-auto px-6 text-center">
+            <span className="inline-block px-3 py-1 text-xs font-semibold bg-amber-500/10 text-amber-400 border border-amber-500/20 rounded-full mb-4">
+              Coming Soon
+            </span>
+            <h2 className="text-3xl font-bold text-white mb-4">Earn $AGNT Tokens</h2>
+            <p className="text-zinc-400 mb-2">Every view. Every like. Every feature. Converted to $AGNT — the currency of the Agentic empire.</p>
+            <p className="text-xs text-zinc-600 mb-12 font-mono">
+              Contract: 0x78B184807C6d64C1F2A50E5E9de5D71941B3f648 · Base Network
+            </p>
+
+            {/* Earn rates grid */}
+            <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-12">
+              {[
+                { action: 'Every 100 views', reward: '10 AGNT' },
+                { action: 'Video featured', reward: '50 AGNT' },
+                { action: 'Founding Creator', reward: '500 AGNT 🎁' },
+                { action: 'Refer a creator', reward: '25 AGNT' },
+              ].map((item) => (
+                <div key={item.action} className="bg-zinc-900 border border-zinc-800 rounded-xl p-4">
+                  <div className="text-violet-400 font-bold text-lg">{item.reward}</div>
+                  <div className="text-zinc-400 text-sm mt-1">{item.action}</div>
+                </div>
+              ))}
+            </div>
+
+            <p className="text-zinc-300">
+              Redeem at the <span className="text-violet-400 font-semibold">Agentic Store</span> — t-shirts, hoodies, exclusive creator merch.{' '}
+              <span className="text-white font-semibold">Earn it. Own it.</span>
+            </p>
+          </div>
+        </section>
+
         {/* HOW IT WORKS */}
         <section className="px-6 py-20">
           <div className="max-w-4xl mx-auto">

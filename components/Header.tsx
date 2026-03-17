@@ -20,6 +20,9 @@ export function Header() {
           <Link href="/browse" className="text-zinc-400 hover:text-white transition-colors">
             Browse
           </Link>
+          <Link href="/leaderboard" className="text-zinc-400 hover:text-white transition-colors">
+            Leaderboard
+          </Link>
           <Link href="/upload" className="text-zinc-400 hover:text-white transition-colors">
             Upload
           </Link>
@@ -65,6 +68,13 @@ export function Header() {
               onClick={() => setMobileMenuOpen(false)}
             >
               Browse
+            </Link>
+            <Link
+              href="/leaderboard"
+              className="block text-white hover:text-violet-400 transition-colors"
+              onClick={() => setMobileMenuOpen(false)}
+            >
+              Leaderboard
             </Link>
             <Link
               href="/upload"
