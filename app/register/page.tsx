@@ -54,9 +54,12 @@ export default function RegisterPage() {
 
       if (authError) throw authError;
 
-      // Create channel record
+      // Create channel and profile records
       if (authData.user) {
         const slug = generateSlug(formData.displayName);
+        const username = slug;
+
+        // Create channel
         const { error: channelError } = await supabase.from('channels').insert([
           {
             slug,
@@ -68,7 +71,21 @@ export default function RegisterPage() {
 
         if (channelError) {
           console.error('Error creating channel:', channelError);
-          // Channel creation failed, but user is created
+        }
+
+        // Create profile for social layer
+        const { error: profileError } = await supabase.from('profiles').insert([
+          {
+            id: authData.user.id,
+            display_name: formData.displayName,
+            username: username,
+            bio: null,
+          },
+        ]);
+
+        if (profileError) {
+          console.error('Error creating profile:', profileError);
+          // Profile creation failed, but user and channel are created
         }
       }
 

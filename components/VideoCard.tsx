@@ -1,6 +1,7 @@
 import Link from 'next/link';
 import { Video, Channel } from '@/lib/types';
 import { formatDate, formatViews, getChannelBadge, getInitials, formatCount } from '@/lib/utils';
+import { CollabBadge, RemixBadge } from '@/components/social/ContentBadges';
 
 interface VideoCardProps {
   video: Video;
@@ -71,10 +72,14 @@ export function VideoCard({ video, channel }: VideoCardProps) {
           <span>{formatDate(video.created_at)}</span>
         </div>
 
-        {/* Badge */}
-        <div className={`mt-2 badge ${badge.color}`}>
-          <span>{badge.emoji}</span>
-          <span>{badge.label}</span>
+        {/* Badges */}
+        <div className="mt-3 flex flex-wrap gap-2">
+          <div className={`badge ${badge.color}`}>
+            <span>{badge.emoji}</span>
+            <span>{badge.label}</span>
+          </div>
+          {video.is_collab && <CollabBadge />}
+          {video.is_remix && <RemixBadge originalTitle={undefined} />}
         </div>
       </div>
     </Link>

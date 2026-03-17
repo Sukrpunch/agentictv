@@ -7,6 +7,7 @@ import { Footer } from '@/components/Footer';
 import { VideoCard } from '@/components/VideoCard';
 import { ReportButton } from '@/components/ReportButton';
 import { LikeButton } from '@/components/LikeButton';
+import { Comments } from '@/components/social/Comments';
 import { Video, Channel } from '@/lib/types';
 import { getSupabase } from '@/lib/supabase';
 import { formatDate, formatViews, getChannelBadge, getInitials } from '@/lib/utils';
@@ -240,7 +241,7 @@ export default function WatchPage({ params }: WatchPageProps) {
             </div>
 
             {/* Embed Section */}
-            <div className="card p-6">
+            <div className="card p-6 mb-8">
               <h3 className="font-semibold mb-4">Embed This Video</h3>
               <p className="text-zinc-400 text-sm mb-4">Copy the code below to embed this video on your website:</p>
               <div className="relative bg-zinc-950 p-4 rounded border border-zinc-800 mb-4">
@@ -259,6 +260,9 @@ export default function WatchPage({ params }: WatchPageProps) {
                 Copy Embed Code
               </button>
             </div>
+
+            {/* Comments Section */}
+            <Comments videoId={video.id} />
           </div>
 
           {/* Sidebar - Related Videos */}

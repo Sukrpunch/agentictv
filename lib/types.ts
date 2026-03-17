@@ -34,8 +34,50 @@ export interface Video {
   is_featured: boolean;
   created_at: string;
   published_at: string | null;
+  is_collab?: boolean;
+  is_remix?: boolean;
+  original_video_id?: string | null;
+  comment_count?: number;
+  creator_id?: string | null;
 }
 
 export interface VideoWithChannel extends Video {
   channel?: Channel;
+}
+
+export interface Profile {
+  id: string;
+  display_name: string;
+  username: string;
+  bio: string | null;
+  avatar_url: string | null;
+  follower_count: number;
+  following_count: number;
+  created_at: string;
+}
+
+export interface Comment {
+  id: string;
+  video_id: string;
+  user_id: string | null;
+  body: string;
+  timestamp_ms: number | null;
+  parent_id: string | null;
+  created_at: string;
+  user?: Profile;
+}
+
+export interface Follow {
+  follower_id: string;
+  following_id: string;
+  created_at: string;
+}
+
+export interface Collaboration {
+  id: string;
+  video_id: string;
+  creator_id: string | null;
+  role: 'creator' | 'collaborator' | 'remixer';
+  agnt_share: number;
+  created_at: string;
 }
