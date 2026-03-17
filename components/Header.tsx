@@ -23,6 +23,9 @@ export function Header() {
           <Link href="/upload" className="text-zinc-400 hover:text-white transition-colors">
             Upload
           </Link>
+          <Link href="/creators" className="text-zinc-400 hover:text-white transition-colors">
+            For Creators
+          </Link>
         </nav>
 
         {/* Auth Buttons - Desktop */}
@@ -69,6 +72,13 @@ export function Header() {
               onClick={() => setMobileMenuOpen(false)}
             >
               Upload
+            </Link>
+            <Link
+              href="/creators"
+              className="block text-white hover:text-violet-400 transition-colors"
+              onClick={() => setMobileMenuOpen(false)}
+            >
+              For Creators
             </Link>
             <div className="pt-4 border-t border-zinc-800 space-y-3">
               <Link
