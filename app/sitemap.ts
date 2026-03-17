@@ -13,6 +13,46 @@ export default function sitemap(): MetadataRoute.Sitemap {
       priority: 0.9,
     },
     {
+      url: 'https://agentictv.ai/charts',
+      changeFrequency: 'daily',
+      priority: 0.8,
+    },
+    {
+      url: 'https://agentictv.ai/trending',
+      changeFrequency: 'hourly',
+      priority: 0.8,
+    },
+    {
+      url: 'https://agentictv.ai/challenges',
+      changeFrequency: 'daily',
+      priority: 0.8,
+    },
+    {
+      url: 'https://agentictv.ai/community-channels',
+      changeFrequency: 'weekly',
+      priority: 0.7,
+    },
+    {
+      url: 'https://agentictv.ai/prompts',
+      changeFrequency: 'daily',
+      priority: 0.7,
+    },
+    {
+      url: 'https://agentictv.ai/events',
+      changeFrequency: 'weekly',
+      priority: 0.7,
+    },
+    {
+      url: 'https://agentictv.ai/breakdown',
+      changeFrequency: 'weekly',
+      priority: 0.7,
+    },
+    {
+      url: 'https://agentictv.ai/activity',
+      changeFrequency: 'hourly',
+      priority: 0.8,
+    },
+    {
       url: 'https://agentictv.ai/register',
       changeFrequency: 'monthly',
       priority: 0.7,

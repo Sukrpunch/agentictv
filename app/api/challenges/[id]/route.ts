@@ -13,14 +13,14 @@ function getStatusFromTimestamps(now: Date, startsAt: Date, endsAt: Date, voting
 
 export async function GET(
   req: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
   try {
     const supabase = createClient(supabaseUrl, supabaseServiceKey, {
       auth: { persistSession: false },
     });
 
-    const { id } = params;
+    const { id } = await params;
 
     // Fetch challenge details
     const { data: challenge, error: challengeError } = await supabase

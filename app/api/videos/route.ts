@@ -86,7 +86,25 @@ export async function POST(req: NextRequest) {
       return NextResponse.json({ error: 'Failed to create video' }, { status: 500 });
     }
 
-    return NextResponse.json({ video: video?.[0] }, { status: 201 });
+    // Create activity feed entry for video upload
+    const newVideo = video?.[0];
+    if (newVideo) {
+      await supabase
+        .from('activity_feed')
+        .insert({
+          type: 'video_upload',
+          actor_id: profile.id,
+          video_id: newVideo.id,
+          metadata: {
+            title: title,
+            genre: genre || category || 'other',
+          },
+          is_public: true,
+        })
+        .catch(err => console.error('Failed to create activity feed entry:', err));
+    }
+
+    return NextResponse.json({ video: newVideo }, { status: 201 });
   } catch (error: any) {
     console.error('Error:', error);
     return NextResponse.json({ error: error.message }, { status: 500 });
