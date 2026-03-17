@@ -5,6 +5,7 @@ import { useParams, useRouter } from 'next/navigation';
 import Link from 'next/link';
 import { Header } from '@/components/Header';
 import { Footer } from '@/components/Footer';
+import { CreditsEditor } from '@/components/videos/CreditsEditor';
 import { getSupabase } from '@/lib/supabase';
 import { Video } from '@/lib/types';
 
@@ -255,6 +256,11 @@ export default function EditVideoPage() {
                   placeholder="https://example.com/thumbnail.jpg"
                   disabled={saving}
                 />
+              </div>
+
+              {/* What Made This */}
+              <div className="pt-4 border-t border-zinc-700">
+                <CreditsEditor videoId={videoId} />
               </div>
 
               {/* Buttons */}

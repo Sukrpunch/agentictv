@@ -2,13 +2,15 @@ import Link from 'next/link';
 import { Video, Channel } from '@/lib/types';
 import { formatDate, formatViews, getChannelBadge, getInitials, formatCount } from '@/lib/utils';
 import { CollabBadge, RemixBadge } from '@/components/social/ContentBadges';
+import { VerifiedBadge } from '@/components/creators/VerifiedBadge';
 
 interface VideoCardProps {
   video: Video;
   channel?: Channel;
+  tipCount?: number;
 }
 
-export function VideoCard({ video, channel }: VideoCardProps) {
+export function VideoCard({ video, channel, tipCount }: VideoCardProps) {
   const badge = getChannelBadge(video.channel_type);
 
   return (
@@ -61,12 +63,14 @@ export function VideoCard({ video, channel }: VideoCardProps) {
             {channel && getInitials(channel.display_name)}
           </div>
           <span className="text-sm text-zinc-400 truncate">{channel?.display_name || 'Unknown'}</span>
+          <VerifiedBadge isVerified={channel?.is_verified || false} size="sm" />
         </div>
 
         {/* Stats */}
         <div className="text-xs text-zinc-500 flex items-center gap-3 mb-2">
           <span>👁 {formatCount(video.view_count)} views</span>
           <span>❤️ {formatCount(video.likes)}</span>
+          {tipCount !== undefined && <span>💰 {formatCount(tipCount)} tips</span>}
         </div>
         <div className="text-xs text-zinc-500">
           <span>{formatDate(video.created_at)}</span>

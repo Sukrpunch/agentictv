@@ -7,6 +7,9 @@ import { Footer } from '@/components/Footer';
 import { VideoCard } from '@/components/VideoCard';
 import { ReportButton } from '@/components/ReportButton';
 import { LikeButton } from '@/components/LikeButton';
+import { TipButton } from '@/components/tips/TipButton';
+import { WhatMadeThis } from '@/components/videos/WhatMadeThis';
+import { VerifiedBadge } from '@/components/creators/VerifiedBadge';
 import { Comments } from '@/components/social/Comments';
 import { Video, Channel } from '@/lib/types';
 import { getSupabase } from '@/lib/supabase';
@@ -23,6 +26,7 @@ export default function WatchPage({ params }: WatchPageProps) {
   const [channel, setChannel] = useState<Channel | null>(null);
   const [relatedVideos, setRelatedVideos] = useState<(Video & { channel?: Channel })[]>([]);
   const [loading, setLoading] = useState(true);
+  const [watchSeconds, setWatchSeconds] = useState(0);
 
   useEffect(() => {
     // Increment view count
@@ -92,6 +96,15 @@ export default function WatchPage({ params }: WatchPageProps) {
 
     fetchData();
   }, [params.id]);
+
+  // Track watch time
+  useEffect(() => {
+    const interval = setInterval(() => {
+      setWatchSeconds((s) => s + 1);
+    }, 1000);
+
+    return () => clearInterval(interval);
+  }, []);
 
   if (loading) {
     return (
@@ -189,9 +202,12 @@ export default function WatchPage({ params }: WatchPageProps) {
                   {channel && getInitials(channel.display_name)}
                 </div>
                 <div>
-                  <Link href={`/channel/${channel?.slug}`} className="font-semibold hover:text-violet-400 transition-colors">
-                    {channel?.display_name || 'Unknown'}
-                  </Link>
+                  <div className="flex items-center gap-2">
+                    <Link href={`/channel/${channel?.slug}`} className="font-semibold hover:text-violet-400 transition-colors">
+                      {channel?.display_name || 'Unknown'}
+                    </Link>
+                    <VerifiedBadge isVerified={channel?.is_verified || false} size="md" />
+                  </div>
                   <p className="text-sm text-zinc-400">{formatViews(channel?.total_views || 0)} total views</p>
                 </div>
               </div>
@@ -208,6 +224,12 @@ export default function WatchPage({ params }: WatchPageProps) {
                 )}
               </div>
               <div className="flex items-center gap-4">
+                <TipButton
+                  videoId={video.id}
+                  creatorId={channel?.id || video.channel_id || ''}
+                  creatorUsername={channel?.display_name || 'Unknown'}
+                  watchSeconds={watchSeconds}
+                />
                 <LikeButton videoId={video.id} initialLikes={video.likes || 0} />
                 <ReportButton contentType="video" contentId={video.id} />
               </div>
@@ -218,6 +240,9 @@ export default function WatchPage({ params }: WatchPageProps) {
               <h3 className="font-semibold mb-4">Description</h3>
               <p className="text-zinc-300 whitespace-pre-wrap">{video.description || 'No description provided.'}</p>
             </div>
+
+            {/* What Made This */}
+            <WhatMadeThis videoId={video.id} />
 
             {/* AI Credits */}
             {video.ai_tool && (

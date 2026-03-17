@@ -13,6 +13,7 @@ export interface Channel {
   total_views: number;
   total_likes: number;
   video_count: number;
+  is_verified?: boolean;
   created_at: string;
 }
 
