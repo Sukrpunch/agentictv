@@ -76,6 +76,9 @@ export async function PATCH(req: NextRequest, { params }: { params: Promise<{ id
       tags,
       upload_status,
       thumbnail_url,
+      is_remix,
+      parent_video_id,
+      linked_track_url,
     } = body;
 
     const updateData: any = {};
@@ -86,6 +89,9 @@ export async function PATCH(req: NextRequest, { params }: { params: Promise<{ id
     if (tags !== undefined) updateData.tags = tags;
     if (upload_status !== undefined) updateData.upload_status = upload_status;
     if (thumbnail_url !== undefined) updateData.thumbnail_url = thumbnail_url;
+    if (is_remix !== undefined) updateData.is_remix = is_remix;
+    if (parent_video_id !== undefined) updateData.parent_video_id = parent_video_id;
+    if (linked_track_url !== undefined) updateData.linked_track_url = linked_track_url;
 
     // Update video
     const { data: updatedVideo, error: updateError } = await supabase

@@ -11,6 +11,7 @@ import { TipButton } from '@/components/tips/TipButton';
 import { WhatMadeThis } from '@/components/videos/WhatMadeThis';
 import { VerifiedBadge } from '@/components/creators/VerifiedBadge';
 import { Comments } from '@/components/social/Comments';
+import { RemixChain } from '@/components/videos/RemixChain';
 import { Video, Channel } from '@/lib/types';
 import { getSupabase } from '@/lib/supabase';
 import { formatDate, formatViews, getChannelBadge, getInitials } from '@/lib/utils';
@@ -243,6 +244,28 @@ export default function WatchPage({ params }: WatchPageProps) {
 
             {/* What Made This */}
             <WhatMadeThis videoId={video.id} />
+
+            {/* Remix Chain */}
+            <RemixChain videoId={video.id} isRemix={video.is_remix || false} />
+
+            {/* AV Pairing - Agentic Radio Link */}
+            {video.linked_track_url && (
+              <div className="card p-6 mb-8 bg-gradient-to-r from-cyan-600/20 to-blue-600/20 border border-cyan-600/30">
+                <a
+                  href={video.linked_track_url}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="flex items-center gap-3 hover:opacity-80 transition"
+                >
+                  <div className="text-3xl">🎵</div>
+                  <div className="flex-1">
+                    <p className="text-sm font-semibold text-cyan-400 uppercase tracking-wider">Soundtrack</p>
+                    <p className="text-lg font-bold text-white">Listen on Agentic Radio →</p>
+                  </div>
+                  <div className="text-2xl">→</div>
+                </a>
+              </div>
+            )}
 
             {/* AI Credits */}
             {video.ai_tool && (

@@ -84,6 +84,11 @@ export function VideoCard({ video, channel, tipCount }: VideoCardProps) {
           </div>
           {video.is_collab && <CollabBadge />}
           {video.is_remix && <RemixBadge originalTitle={undefined} />}
+          {video.linked_track_url && (
+            <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-xs font-medium bg-blue-500/20 text-blue-300 border border-blue-500/30">
+              🎵 Soundtrack
+            </span>
+          )}
         </div>
       </div>
     </Link>

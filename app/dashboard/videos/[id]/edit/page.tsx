@@ -28,7 +28,12 @@ export default function EditVideoPage() {
     tags: '',
     upload_status: 'published' as 'draft' | 'published' | 'unlisted',
     thumbnail_url: '',
+    is_remix: false,
+    parent_video_id: '',
+    linked_track_url: '',
   });
+  const [parentVideoSearch, setParentVideoSearch] = useState('');
+  const [parentVideoResults, setParentVideoResults] = useState<Video[]>([]);
 
   useEffect(() => {
     async function loadData() {
@@ -63,6 +68,9 @@ export default function EditVideoPage() {
         tags: videoData.tags?.join(', ') || '',
         upload_status: videoData.upload_status || 'published',
         thumbnail_url: videoData.thumbnail_url || '',
+        is_remix: videoData.is_remix || false,
+        parent_video_id: videoData.parent_video_id || '',
+        linked_track_url: videoData.linked_track_url || '',
       });
 
       setLoading(false);
@@ -93,6 +101,9 @@ export default function EditVideoPage() {
           tags: formData.tags.split(',').map((t) => t.trim()).filter(Boolean),
           upload_status: formData.upload_status,
           thumbnail_url: formData.thumbnail_url,
+          is_remix: formData.is_remix,
+          parent_video_id: formData.parent_video_id || null,
+          linked_track_url: formData.linked_track_url || null,
         }),
       });
 
@@ -254,6 +265,98 @@ export default function EditVideoPage() {
                   onChange={(e) => setFormData({ ...formData, thumbnail_url: e.target.value })}
                   className="input-field"
                   placeholder="https://example.com/thumbnail.jpg"
+                  disabled={saving}
+                />
+              </div>
+
+              {/* Remix Info */}
+              <div className="pt-4 border-t border-zinc-700">
+                <label className="flex items-center gap-2 mb-4">
+                  <input
+                    type="checkbox"
+                    checked={formData.is_remix}
+                    onChange={(e) => {
+                      setFormData({
+                        ...formData,
+                        is_remix: e.target.checked,
+                        parent_video_id: e.target.checked ? formData.parent_video_id : '',
+                      });
+                    }}
+                    className="w-4 h-4 accent-violet-600"
+                    disabled={saving}
+                  />
+                  <span className="text-sm font-medium">Is this a remix or response?</span>
+                </label>
+
+                {formData.is_remix && (
+                  <div className="bg-zinc-900/50 p-4 rounded-lg">
+                    <label className="block text-sm font-medium mb-2">
+                      Search for original video
+                    </label>
+                    <input
+                      type="text"
+                      value={parentVideoSearch}
+                      onChange={async (e) => {
+                        setParentVideoSearch(e.target.value);
+                        if (e.target.value.length > 2) {
+                          const response = await fetch(
+                            `/api/search?q=${encodeURIComponent(e.target.value)}`
+                          );
+                          if (response.ok) {
+                            const data = await response.json();
+                            setParentVideoResults(data.videos || []);
+                          }
+                        } else {
+                          setParentVideoResults([]);
+                        }
+                      }}
+                      placeholder="Search videos..."
+                      className="input-field mb-3"
+                      disabled={saving}
+                    />
+
+                    {parentVideoResults.length > 0 && (
+                      <div className="space-y-2 max-h-48 overflow-y-auto">
+                        {parentVideoResults.map((video) => (
+                          <button
+                            key={video.id}
+                            type="button"
+                            onClick={() => {
+                              setFormData({
+                                ...formData,
+                                parent_video_id: video.id,
+                              });
+                              setParentVideoSearch('');
+                              setParentVideoResults([]);
+                            }}
+                            className="w-full text-left p-2 bg-zinc-800 hover:bg-zinc-700 rounded text-sm transition"
+                          >
+                            {video.title}
+                          </button>
+                        ))}
+                      </div>
+                    )}
+
+                    {formData.parent_video_id && (
+                      <p className="text-xs text-green-400 mt-2">✓ Original video selected</p>
+                    )}
+                  </div>
+                )}
+              </div>
+
+              {/* AV Pairing */}
+              <div className="pt-4">
+                <label className="block text-sm font-medium mb-2">
+                  Link an Agentic Radio Track (optional)
+                </label>
+                <input
+                  type="url"
+                  value={formData.linked_track_url}
+                  onChange={(e) =>
+                    setFormData({ ...formData, linked_track_url: e.target.value })
+                  }
+                  className="input-field"
+                  placeholder="https://agenticradio.ai/tracks/[id]"
                   disabled={saving}
                 />
               </div>

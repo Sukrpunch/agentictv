@@ -6,6 +6,7 @@ import { Header } from '@/components/Header';
 import { Footer } from '@/components/Footer';
 import { VideoCard } from '@/components/VideoCard';
 import { VideoSkeletonGrid } from '@/components/VideoSkeleton';
+import { DailyMix } from '@/components/recommendations/DailyMix';
 import { Video, Channel, VideoCategory } from '@/lib/types';
 import { getSupabase } from '@/lib/supabase';
 
@@ -211,6 +212,9 @@ export default function BrowsePage() {
                 : 'Discover AI-generated content from creators worldwide'}
             </p>
           </div>
+
+          {/* Daily Mix */}
+          {user && <DailyMix userId={user.id} />}
 
           {/* Search Bar */}
           <div className="mb-12">

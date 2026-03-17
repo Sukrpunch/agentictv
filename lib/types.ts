@@ -40,6 +40,8 @@ export interface Video {
   is_collab?: boolean;
   is_remix?: boolean;
   original_video_id?: string | null;
+  parent_video_id?: string | null;
+  linked_track_url?: string | null;
   comment_count?: number;
   creator_id?: string | null;
   genre?: string | null;

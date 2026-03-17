@@ -4,6 +4,8 @@ import { useState, useEffect, useRef } from 'react';
 import Link from 'next/link';
 import { useRouter, useSearchParams } from 'next/navigation';
 import { getSupabase } from '@/lib/supabase';
+import { Header } from '@/components/Header';
+import { Footer } from '@/components/Footer';
 
 interface Message {
   id: string;
@@ -61,6 +63,28 @@ export function MessageThreadContent({
 
       if (isExistingConversation) {
         fetchMessages(conversationId, authUser.id);
+        
+        // Subscribe to realtime message inserts
+        const channel = supabase
+          .channel(`conversation:${conversationId}`)
+          .on(
+            'postgres_changes',
+            {
+              event: 'INSERT',
+              schema: 'public',
+              table: 'messages',
+              filter: `conversation_id=eq.${conversationId}`,
+            },
+            (payload) => {
+              const newMessage = payload.new as Message;
+              setMessages((prev) => [...prev, newMessage]);
+            }
+          )
+          .subscribe();
+
+        return () => {
+          supabase.removeChannel(channel);
+        };
       } else {
         // New conversation with userId
         setLoading(false);

@@ -59,6 +59,9 @@ export function Header() {
           <Link href="/leaderboard" className="text-zinc-400 hover:text-white transition-colors whitespace-nowrap">
             Leaderboard
           </Link>
+          <Link href="/breakdown" className="text-zinc-400 hover:text-white transition-colors whitespace-nowrap">
+            📊 Breakdown
+          </Link>
           {user && (
             <>
               <Link href="/upload" className="text-zinc-400 hover:text-white transition-colors whitespace-nowrap">
@@ -205,6 +208,13 @@ export function Header() {
               onClick={() => setMobileMenuOpen(false)}
             >
               Leaderboard
+            </Link>
+            <Link
+              href="/breakdown"
+              className="block text-white hover:text-violet-400 transition-colors"
+              onClick={() => setMobileMenuOpen(false)}
+            >
+              📊 Breakdown
             </Link>
             {user && (
               <>
