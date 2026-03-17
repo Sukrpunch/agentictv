@@ -12,6 +12,7 @@ import { getSupabase } from '@/lib/supabase';
 const categories: VideoCategory[] = ['synthwave', 'documentary', 'news', 'comedy', 'tutorial', 'nature', 'other'];
 
 export default function BrowsePage() {
+  const [user, setUser] = useState<any>(null);
   const [videos, setVideos] = useState<(Video & { channel?: Channel })[]>([]);
   const [selectedCategory, setSelectedCategory] = useState<VideoCategory | 'all'>('all');
   const [sortBy, setSortBy] = useState<'latest' | 'views' | 'likes' | 'featured'>('latest');
@@ -19,6 +20,17 @@ export default function BrowsePage() {
   const [searchResults, setSearchResults] = useState<number>(0);
   const [loading, setLoading] = useState(true);
   const [searchLoading, setSearchLoading] = useState(false);
+  const [feedTab, setFeedTab] = useState<'discover' | 'following'>('discover');
+
+  // Check authentication
+  useEffect(() => {
+    async function checkAuth() {
+      const supabase = getSupabase();
+      const { data: { user: authUser } } = await supabase.auth.getUser();
+      setUser(authUser);
+    }
+    checkAuth();
+  }, []);
 
   // Debounced search
   useEffect(() => {
@@ -34,47 +46,93 @@ export default function BrowsePage() {
     return () => clearTimeout(timer);
   }, [searchQuery]);
 
-  // Fetch default videos when category/sort changes
+  // Fetch default videos when category/sort/tab changes
   useEffect(() => {
     if (searchQuery.trim().length === 0) {
       fetchDefaultVideos();
     }
-  }, [selectedCategory, sortBy]);
+  }, [selectedCategory, sortBy, feedTab]);
 
   async function fetchDefaultVideos() {
     try {
       setLoading(true);
       const supabase = getSupabase();
-      let query = supabase
-        .from('videos')
-        .select('*, channel:channels(*)')
-        .eq('status', 'ready');
 
-      if (selectedCategory !== 'all') {
-        query = query.eq('category', selectedCategory);
-      }
+      if (feedTab === 'following') {
+        if (!user) {
+          setVideos([]);
+          setLoading(false);
+          return;
+        }
 
-      if (sortBy === 'latest') {
+        // Get users that current user follows
+        const { data: followingData, error: followError } = await supabase
+          .from('follows')
+          .select('following_id')
+          .eq('follower_id', user.id);
+
+        if (followError || !followingData || followingData.length === 0) {
+          setVideos([]);
+          setLoading(false);
+          return;
+        }
+
+        const followingIds = followingData.map((f: any) => f.following_id);
+
+        // Get videos from followed creators
+        let query = supabase
+          .from('videos')
+          .select('*, channel:channels(*), creator:creator_id(display_name, username)')
+          .eq('status', 'ready')
+          .in('creator_id', followingIds);
+
+        if (selectedCategory !== 'all') {
+          query = query.eq('category', selectedCategory);
+        }
+
         query = query.order('created_at', { ascending: false });
-      } else if (sortBy === 'views') {
-        query = query.order('view_count', { ascending: false });
-      } else if (sortBy === 'likes') {
-        query = query.order('likes', { ascending: false });
-      } else if (sortBy === 'featured') {
-        query = query.eq('is_featured', true).order('created_at', { ascending: false });
-      }
 
-      const { data, error } = await query.limit(20);
+        const { data, error } = await query.limit(20);
 
-      if (error) {
-        console.error('Error fetching videos:', error);
-        setVideos(placeholderVideos);
+        if (error) {
+          console.error('Error fetching videos:', error);
+          setVideos([]);
+        } else {
+          setVideos(data || []);
+        }
       } else {
-        setVideos(data || placeholderVideos);
+        // Discover tab - all videos
+        let query = supabase
+          .from('videos')
+          .select('*, channel:channels(*)')
+          .eq('status', 'ready');
+
+        if (selectedCategory !== 'all') {
+          query = query.eq('category', selectedCategory);
+        }
+
+        if (sortBy === 'latest') {
+          query = query.order('created_at', { ascending: false });
+        } else if (sortBy === 'views') {
+          query = query.order('view_count', { ascending: false });
+        } else if (sortBy === 'likes') {
+          query = query.order('likes', { ascending: false });
+        } else if (sortBy === 'featured') {
+          query = query.eq('is_featured', true).order('created_at', { ascending: false });
+        }
+
+        const { data, error } = await query.limit(20);
+
+        if (error) {
+          console.error('Error fetching videos:', error);
+          setVideos(placeholderVideos);
+        } else {
+          setVideos(data || placeholderVideos);
+        }
       }
     } catch (err) {
       console.error('Error:', err);
-      setVideos(placeholderVideos);
+      setVideos(feedTab === 'discover' ? placeholderVideos : []);
     } finally {
       setLoading(false);
     }
@@ -113,8 +171,45 @@ export default function BrowsePage() {
         <div className="max-w-7xl mx-auto">
           {/* Header */}
           <div className="mb-8">
-            <h1 className="text-4xl font-bold mb-2">Browse Videos</h1>
-            <p className="text-zinc-400">Discover AI-generated content from creators worldwide</p>
+            <h1 className="text-4xl font-bold mb-4">Browse Videos</h1>
+            
+            {/* Tabs */}
+            {user && (
+              <div className="flex gap-6 border-b border-zinc-800 mb-4">
+                <button
+                  onClick={() => setFeedTab('discover')}
+                  className={`pb-3 font-medium transition-colors relative ${
+                    feedTab === 'discover'
+                      ? 'text-violet-400'
+                      : 'text-zinc-400 hover:text-white'
+                  }`}
+                >
+                  Discover
+                  {feedTab === 'discover' && (
+                    <div className="absolute bottom-0 left-0 right-0 h-1 bg-violet-600" />
+                  )}
+                </button>
+                <button
+                  onClick={() => setFeedTab('following')}
+                  className={`pb-3 font-medium transition-colors relative ${
+                    feedTab === 'following'
+                      ? 'text-violet-400'
+                      : 'text-zinc-400 hover:text-white'
+                  }`}
+                >
+                  Following
+                  {feedTab === 'following' && (
+                    <div className="absolute bottom-0 left-0 right-0 h-1 bg-violet-600" />
+                  )}
+                </button>
+              </div>
+            )}
+            
+            <p className="text-zinc-400">
+              {feedTab === 'following'
+                ? 'Videos from creators you follow'
+                : 'Discover AI-generated content from creators worldwide'}
+            </p>
           </div>
 
           {/* Search Bar */}
@@ -215,10 +310,19 @@ export default function BrowsePage() {
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
                 </svg>
               </div>
-              <h3 className="text-xl font-bold mb-2">No videos yet</h3>
-              <p className="text-zinc-400 mb-6">Be the first AI creator to upload content in this category.</p>
-              <Link href="/register" className="btn-primary inline-block">
-                Start Your Channel
+              <h3 className="text-xl font-bold mb-2">
+                {feedTab === 'following' ? 'No videos yet' : 'No videos yet'}
+              </h3>
+              <p className="text-zinc-400 mb-6">
+                {feedTab === 'following'
+                  ? 'Follow some creators to see their videos here'
+                  : 'Be the first AI creator to upload content in this category.'}
+              </p>
+              <Link
+                href={feedTab === 'following' ? '/creators' : '/register'}
+                className="btn-primary inline-block"
+              >
+                {feedTab === 'following' ? 'Discover Creators' : 'Start Your Channel'}
               </Link>
             </div>
           ) : (

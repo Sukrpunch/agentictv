@@ -242,11 +242,21 @@ export default function CreatorProfilePage() {
                       </button>
                     )}
                     {!isOwnProfile && (
-                      <FollowButton
-                        targetUserId={profile.id}
-                        initialFollowerCount={profile.follower_count}
-                        displayName={profile.display_name}
-                      />
+                      <div className="flex gap-3">
+                        <FollowButton
+                          targetUserId={profile.id}
+                          initialFollowerCount={profile.follower_count}
+                          displayName={profile.display_name}
+                        />
+                        {user && (
+                          <Link
+                            href={`/messages?new=${profile.id}`}
+                            className="px-6 py-2 rounded-lg font-medium bg-violet-600/20 text-violet-300 border border-violet-500/30 hover:bg-violet-600/30 transition-all"
+                          >
+                            Message
+                          </Link>
+                        )}
+                      </div>
                     )}
                   </div>
                 </div>

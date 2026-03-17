@@ -1,10 +1,23 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import Link from 'next/link';
+import { getSupabase } from '@/lib/supabase';
+import { NotificationBell } from './notifications/NotificationBell';
+import { MessagesIcon } from './social/MessagesIcon';
 
 export function Header() {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
+  const [user, setUser] = useState<any>(null);
+
+  useEffect(() => {
+    async function checkAuth() {
+      const supabase = getSupabase();
+      const { data: { user: authUser } } = await supabase.auth.getUser();
+      setUser(authUser);
+    }
+    checkAuth();
+  }, []);
 
   return (
     <header className="sticky top-0 z-50 glass border-b border-zinc-800">
@@ -33,12 +46,24 @@ export function Header() {
 
         {/* Auth Buttons - Desktop */}
         <div className="hidden md:flex items-center gap-4">
-          <Link href="/login" className="text-zinc-400 hover:text-white transition-colors">
-            Sign In
-          </Link>
-          <Link href="/register" className="btn-primary px-4 py-2 text-sm">
-            Get Started
-          </Link>
+          {user ? (
+            <>
+              <NotificationBell />
+              <MessagesIcon />
+              <Link href="/dashboard" className="text-zinc-400 hover:text-white transition-colors">
+                Dashboard
+              </Link>
+            </>
+          ) : (
+            <>
+              <Link href="/login" className="text-zinc-400 hover:text-white transition-colors">
+                Sign In
+              </Link>
+              <Link href="/register" className="btn-primary px-4 py-2 text-sm">
+                Get Started
+              </Link>
+            </>
+          )}
         </div>
 
         {/* Mobile Menu Button */}
