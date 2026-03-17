@@ -84,8 +84,8 @@ export default function UploadPage() {
   const handleFileSelect = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (file) {
-      if (file.size > 500 * 1024 * 1024) {
-        alert('File size must be less than 500MB');
+      if (file.size > 4 * 1024 * 1024 * 1024) {
+        alert('File size must be less than 4GB');
         return;
       }
       if (!file.type.startsWith('video/')) {
@@ -344,7 +344,7 @@ export default function UploadPage() {
                       <p className="text-lg font-semibold mb-2">
                         {selectedFile ? selectedFile.name : 'Click to upload or drag and drop'}
                       </p>
-                      <p className="text-sm text-zinc-400">MP4, WebM, or MOV (max 500MB)</p>
+                      <p className="text-sm text-zinc-400">MP4, WebM, or MOV (max 4GB)</p>
                     </label>
                   </div>
                   {selectedFile && (
